@@ -5,26 +5,20 @@ A simple smart wallet system that allows users to **send and receive crypto usin
 
 This MVP uses an **off-chain phone → wallet mapping** for speed, low cost, and easy onboarding.  
 It includes:
-- A Solidity smart contract for ETH transfers
 - A Node.js backend API for phone number resolution
 - A React frontend for sending/receiving payments
 
 ---
 
 ## 🚀 Features
-- **Phone Number Payments** — send ETH using a phone number.
+- **Phone Number Payments** — send crypto using a phone number.
 - **OTP Verification** — verify phone ownership before linking to wallet.
 - **Secure Mapping** — store hashed + salted phone numbers in database.
-- **Low Gas Costs** — no on-chain registry required.
 - **Easy Setup** — works with MetaMask, WalletConnect, or any EVM wallet.
 
 ---
 
 ## 🛠 Tech Stack
-### Smart Contract
-- Solidity (0.8.x)
-- Hardhat
-
 ### Backend
 - Node.js + Express
 - PostgreSQL / MongoDB
@@ -45,8 +39,6 @@ smart-wallet-phone-payments/
 │   ├── routes/         # API endpoints (register, resolve)
 │   ├── db/             # Database models
 │   └── server.js       # Main server entry
-├── contracts/          # Solidity smart contracts
-│   └── SimpleWalletSender.sol
 ├── frontend/           # React/Next.js frontend
 │   ├── pages/          # Send & Claim pages
 │   ├── components/     # UI components
@@ -66,7 +58,7 @@ smart-wallet-phone-payments/
 2. **Sending Payments**
    - Sender inputs recipient’s phone number.
    - Frontend calls `GET /resolve` → backend returns wallet address.
-   - Frontend calls smart contract `sendETH()` with recipient’s address.
+   - Frontend initiates a client-side transaction to the recipient's address.
 
 3. **Receiving Payments**
    - If registered: funds go directly to linked wallet.
@@ -77,22 +69,6 @@ smart-wallet-phone-payments/
 ## 🔒 Security Considerations
 - Phone numbers are **hashed + salted** before storage.
 - API endpoints require authentication for sending funds.
-- Smart contract is minimal to reduce attack surface.
-
----
-
-## 📜 Smart Contract Example
-```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
-
-contract SimpleWalletSender {
-    function sendETH(address payable _to) public payable {
-        require(msg.value > 0, "No ETH sent");
-        _to.transfer(msg.value);
-    }
-}
-````
 
 ---
 
@@ -139,16 +115,7 @@ npm start
 
 * Configure DB connection & OTP service in `.env`.
 
-### 3️⃣ Smart Contract
-
-```bash
-cd contracts
-npm install
-npx hardhat compile
-npx hardhat run scripts/deploy.js --network sepolia
-```
-
-### 4️⃣ Frontend Setup
+### 3️⃣ Frontend Setup
 
 ```bash
 cd frontend
@@ -172,4 +139,5 @@ npm run dev
 MIT License — feel free to use and modify.
 
 ---
+
 

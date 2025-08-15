@@ -14,7 +14,7 @@ export function WalletResolverCard() {
   return (
     <Card className="w-full max-w-md shadow-2xl rounded-2xl overflow-hidden border-2 border-gray-200/60">
       <CardHeader className="text-center bg-white p-6 relative border-b">
-        <CardTitle className="text-3xl font-bold text-primary" style={{fontFamily: 'Inter, sans-serif'}}>Wallet Resolver</CardTitle>
+        <CardTitle className="text-3xl font-bold text-primary">Wallet Resolver</CardTitle>
         <CardDescription className="text-base text-gray-500">Send crypto using just a phone number.</CardDescription>
         <div className="absolute top-3 right-3">
           <AIGuide />

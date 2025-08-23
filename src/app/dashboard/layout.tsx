@@ -1,10 +1,9 @@
 
 'use client';
 
-import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Sidebar, SidebarProvider, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { LayoutDashboard, Send, UserPlus, Home } from "lucide-react";
+import { LayoutDashboard, Send, UserPlus, Home, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 
@@ -20,6 +19,10 @@ export default function DashboardLayout({
     <SidebarProvider>
       <div className="flex flex-col min-h-screen">
           <Sidebar>
+            <div className="flex items-center gap-2 p-4 border-b">
+                <Wallet className="h-8 w-8 text-primary" />
+                <h2 className="text-xl font-bold text-primary">Wallet Resolver</h2>
+            </div>
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton asChild isActive={isActive('/dashboard')}>
@@ -58,8 +61,13 @@ export default function DashboardLayout({
           <SidebarInset>
             <div className="flex flex-col flex-1">
                 <header className="flex items-center justify-between p-4 border-b">
+                    <div className="md:hidden">
+                        <SidebarTrigger />
+                    </div>
                     <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
-                    <SidebarTrigger />
+                    <div className="hidden md:block">
+                        <SidebarTrigger />
+                    </div>
                 </header>
                 <main className="flex-grow p-4 md:p-6 lg:p-8">
                     {children}

@@ -6,6 +6,8 @@ import { Sidebar, SidebarProvider, SidebarMenu, SidebarMenuItem, SidebarMenuButt
 import { LayoutDashboard, Send, UserPlus, Home, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
+import { Breadcrumbs } from "@/components/ui/breadcrumb";
+import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
 
 export default function DashboardLayout({
   children,
@@ -14,6 +16,7 @@ export default function DashboardLayout({
 }) {
     const pathname = usePathname();
     const isActive = (path: string) => pathname === path;
+    const breadcrumbs = useBreadcrumbs();
 
   return (
     <SidebarProvider>
@@ -61,10 +64,12 @@ export default function DashboardLayout({
           <SidebarInset>
             <div className="flex flex-col flex-1">
                 <header className="flex items-center justify-between p-4 border-b">
-                    <div className="md:hidden">
-                        <SidebarTrigger />
+                    <div className="flex items-center gap-4">
+                        <div className="md:hidden">
+                            <SidebarTrigger />
+                        </div>
+                        <Breadcrumbs segments={breadcrumbs} />
                     </div>
-                    <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
                     <div className="hidden md:block">
                         <SidebarTrigger />
                     </div>

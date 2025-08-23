@@ -42,11 +42,27 @@ export interface PhoneInputProps
   onChange?: (value: string) => void;
 }
 
+const formatPhoneNumber = (value: string): string => {
+    if (!value) return value;
+    const phoneNumber = value.replace(/[^\d]/g, '');
+    const phoneNumberLength = phoneNumber.length;
+    if (phoneNumberLength < 4) return phoneNumber;
+    if (phoneNumberLength < 7) {
+        return `${phoneNumber.slice(0, 3)} ${phoneNumber.slice(3)}`;
+    }
+    return `${phoneNumber.slice(0, 3)} ${phoneNumber.slice(3, 6)} ${phoneNumber.slice(6, 10)}`;
+};
+
+
 const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
   ({ className, value, onChange, ...props }, ref) => {
     const [open, setOpen] = React.useState(false)
     const [scannerOpen, setScannerOpen] = React.useState(false);
     const [selectedCountry, setSelectedCountry] = React.useState(countries[0])
+    const inputRef = React.useRef<HTMLInputElement>(null);
+
+    React.useImperativeHandle(ref, () => inputRef.current!);
+
 
     const handleCountrySelect = (currentValue: string) => {
       const country = countries.find((c) => c.value === currentValue);
@@ -59,10 +75,24 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
     }
 
     const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newPhoneNumber = e.target.value;
+      const input = e.target;
+      const formattedNumber = formatPhoneNumber(input.value);
       const countryCode = selectedCountry.code;
-      const fullNumber = `${countryCode} ${newPhoneNumber.replace(countryCode, '').trim()}`;
+      const fullNumber = `${countryCode} ${formattedNumber}`;
+
+      // This is to maintain the cursor position
+      const selectionStart = input.selectionStart;
+      const originalLength = input.value.length;
+      const newLength = formattedNumber.length;
+      
       onChange?.(fullNumber);
+
+      if (selectionStart !== null) {
+          const newPosition = selectionStart + (newLength - originalLength);
+          setTimeout(() => {
+              inputRef.current?.setSelectionRange(newPosition, newPosition);
+          }, 0);
+      }
     };
 
     const handleQrScan = (scannedValue: string) => {
@@ -133,7 +163,7 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
                 className="rounded-l-none pr-20"
                 value={displayPhoneNumber}
                 onChange={handlePhoneNumberChange}
-                ref={ref}
+                ref={inputRef}
                 {...props}
             />
             <div className="absolute inset-y-0 right-0 flex items-center">

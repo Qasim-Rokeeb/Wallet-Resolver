@@ -23,6 +23,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { PhoneInput } from '../ui/phone-input';
 
 const sendFormSchema = z.object({
   phone: z.string().min(10, { message: "Phone number must be at least 10 digits." }),
@@ -100,7 +101,7 @@ export function SendForm() {
                   </Tooltip>
               </div>
               <FormControl>
-                <Input type="tel" placeholder="+1 (555) 123-4567" {...field} />
+                <PhoneInput {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

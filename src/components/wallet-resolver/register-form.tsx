@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { UserPlus, Wallet } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { PhoneInput } from '../ui/phone-input';
 
 const registerFormSchema = z.object({
     phone: z.string().min(10, { message: "Phone number must be at least 10 digits." }),
@@ -86,7 +87,7 @@ export function RegisterForm() {
                 <FormItem>
                     <FormLabel>Your Phone Number</FormLabel>
                     <FormControl>
-                    <Input type="tel" placeholder="+1 (555) 987-6543" {...field} />
+                    <PhoneInput {...field} />
                     </FormControl>
                     <FormMessage />
                 </FormItem>

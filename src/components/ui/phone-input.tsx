@@ -63,12 +63,32 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
 
     React.useImperativeHandle(ref, () => inputRef.current!);
 
+    React.useEffect(() => {
+        try {
+            const userLocale = navigator.language; // e.g., "en-US"
+            const countryCodeFromLocale = userLocale.split('-')[1]?.toLowerCase(); // e.g., "us"
+
+            if (countryCodeFromLocale) {
+                const country = countries.find(c => c.value === countryCodeFromLocale);
+                if (country) {
+                    setSelectedCountry(country);
+                    if (!value?.trim()) {
+                        onChange?.(`${country.code} `);
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn("Could not auto-detect country code.", e);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Run only once on mount
+
 
     const handleCountrySelect = (currentValue: string) => {
       const country = countries.find((c) => c.value === currentValue);
       if (country) {
         setSelectedCountry(country);
-        const phoneNumber = value?.split(' ')[1] || '';
+        const phoneNumber = value?.split(' ').slice(1).join(' ') || '';
         onChange?.(`${country.code} ${phoneNumber}`);
       }
       setOpen(false)

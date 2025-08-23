@@ -187,7 +187,7 @@ export function RegisterForm() {
                     <FormLabel>Wallet Address</FormLabel>
                     <div className="relative">
                         <FormControl>
-                            <Input placeholder="Link wallet or paste address e.g. 0x..." {...field} className="pr-10" />
+                            <Input placeholder="Link your wallet or paste an address, e.g., 0x..." {...field} className="pr-10" />
                         </FormControl>
                         <Button
                             type="button"

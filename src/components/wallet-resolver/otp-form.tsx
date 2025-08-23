@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, AlertTriangle } from 'lucide-react';
+import { CheckCircle, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Skeleton } from '../ui/skeleton';
@@ -21,6 +21,7 @@ type OtpFormValues = z.infer<typeof otpFormSchema>;
 interface OtpFormProps {
     phone: string;
     onSuccess: () => void;
+    onBack: () => void;
 }
 
 function OtpFormSkeleton() {
@@ -35,7 +36,7 @@ function OtpFormSkeleton() {
     )
 }
 
-export function OtpForm({ phone, onSuccess }: OtpFormProps) {
+export function OtpForm({ phone, onSuccess, onBack }: OtpFormProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(30);
@@ -157,8 +158,8 @@ export function OtpForm({ phone, onSuccess }: OtpFormProps) {
           Verify
         </Button>
 
-        <div className="text-center">
-            <Button
+        <div className="text-center space-y-2">
+             <Button
               variant="link"
               type="button"
               size="sm"
@@ -168,6 +169,16 @@ export function OtpForm({ phone, onSuccess }: OtpFormProps) {
               {resendCooldown > 0
                 ? `Didn't receive a code? Resend in ${resendCooldown}s`
                 : "Didn't receive a code? Resend"}
+            </Button>
+            <Button
+              variant="ghost"
+              type="button"
+              size="sm"
+              className="flex items-center gap-2 mx-auto"
+              onClick={onBack}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Change phone number
             </Button>
         </div>
       </form>

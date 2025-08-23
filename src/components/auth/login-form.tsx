@@ -91,8 +91,13 @@ export function LoginForm() {
     });
   }
 
+  const handleOtpBack = () => {
+    setShowOtpForm(false);
+    setFormData(null);
+  }
+
   if (showOtpForm && formData) {
-    return <OtpForm phone={formData.phone} onSuccess={handleOtpSuccess} />;
+    return <OtpForm phone={formData.phone} onSuccess={handleOtpSuccess} onBack={handleOtpBack} />;
   }
 
   return (

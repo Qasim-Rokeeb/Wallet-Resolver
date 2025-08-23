@@ -132,6 +132,11 @@ export function RegisterForm() {
     setShowSuccessScreen(true);
   }
 
+  const handleOtpBack = () => {
+    setShowOtpForm(false);
+    setPhoneNumber('');
+  }
+
   const handleDone = () => {
     setShowSuccessScreen(false);
     form.reset({ phone: '', walletAddress: walletAddress || ''});
@@ -146,7 +151,7 @@ export function RegisterForm() {
   }
 
   if (showOtpForm) {
-    return <OtpForm phone={phoneNumber} onSuccess={handleOtpSuccess} />;
+    return <OtpForm phone={phoneNumber} onSuccess={handleOtpSuccess} onBack={handleOtpBack} />;
   }
 
   return (

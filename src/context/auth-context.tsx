@@ -11,7 +11,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   userPhone: string | null;
-  login: (phone: string) => void;
+  login: (phone: string, rememberMe?: boolean) => void;
   logout: () => void;
 }
 
@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const transactionContext = useTransaction();
 
   useEffect(() => {
-    const storedPhone = localStorage.getItem(AUTH_USER_PHONE_KEY);
+    const storedPhone = localStorage.getItem(AUTH_USER_PHONE_KEY) || sessionStorage.getItem(AUTH_USER_PHONE_KEY);
     if (storedPhone) {
       setUserPhone(storedPhone);
       setIsAuthenticated(true);
@@ -39,16 +39,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  const login = (phone: string) => {
+  const login = (phone: string, rememberMe = false) => {
     setUserPhone(phone);
     setIsAuthenticated(true);
-    localStorage.setItem(AUTH_USER_PHONE_KEY, phone);
+    if (rememberMe) {
+        localStorage.setItem(AUTH_USER_PHONE_KEY, phone);
+    } else {
+        sessionStorage.setItem(AUTH_USER_PHONE_KEY, phone);
+    }
   };
 
   const logout = () => {
     setUserPhone(null);
     setIsAuthenticated(false);
     localStorage.removeItem(AUTH_USER_PHONE_KEY);
+    sessionStorage.removeItem(AUTH_USER_PHONE_KEY);
 
     // Clear related contexts
     walletContext?.disconnectWallet(false); // Pass false to prevent toast

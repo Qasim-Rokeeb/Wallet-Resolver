@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import { useWallet } from '@/context/wallet-context';
 import { usePhoneVerification } from '@/context/phone-verification-context';
 import { Separator } from '../ui/separator';
+import { Checkbox } from '../ui/checkbox';
 
 const loginFormSchema = z.object({
     phone: z.string().refine(value => {
@@ -24,6 +25,7 @@ const loginFormSchema = z.object({
         const number = parts.slice(1).join('');
         return /^\d{7,15}$/.test(number);
     }, { message: "Please enter a valid phone number." }),
+    rememberMe: z.boolean().default(false),
 });
 
 type LoginFormValues = z.infer<typeof loginFormSchema>;
@@ -33,7 +35,7 @@ export function LoginForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showOtpForm, setShowOtpForm] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [formData, setFormData] = useState<LoginFormValues | null>(null);
   const { login } = useAuth();
   const { connectWallet } = useWallet();
   const { verifyPhone } = usePhoneVerification();
@@ -42,6 +44,7 @@ export function LoginForm() {
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
       phone: '',
+      rememberMe: true,
     },
   });
 
@@ -54,13 +57,15 @@ export function LoginForm() {
             description: 'A verification code has been sent to your phone.',
             variant: 'success',
         });
-        setPhoneNumber(values.phone);
+        setFormData(values);
         setLoading(false);
         setShowOtpForm(true);
     }, 1500);
   };
 
   const handleOtpSuccess = () => {
+    if (!formData) return;
+
     toast({
       variant: 'success',
       title: 'Login Successful!',
@@ -70,7 +75,7 @@ export function LoginForm() {
     // In a real app, you'd get this from your backend after login
     const mockWalletAddress = "0x" + Array(40).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
     
-    login(phoneNumber);
+    login(formData.phone, formData.rememberMe);
     connectWallet(mockWalletAddress);
     verifyPhone(); // Assume phone is verified on login
     
@@ -86,8 +91,8 @@ export function LoginForm() {
     });
   }
 
-  if (showOtpForm) {
-    return <OtpForm phone={phoneNumber} onSuccess={handleOtpSuccess} />;
+  if (showOtpForm && formData) {
+    return <OtpForm phone={formData.phone} onSuccess={handleOtpSuccess} />;
   }
 
   return (
@@ -105,6 +110,25 @@ export function LoginForm() {
                         </FormControl>
                         <FormMessage />
                     </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="rememberMe"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                                <Checkbox
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                                <FormLabel>
+                                    Remember me
+                                </FormLabel>
+                            </div>
+                        </FormItem>
                     )}
                 />
                 <Button type="submit" className="w-full" disabled={loading}>

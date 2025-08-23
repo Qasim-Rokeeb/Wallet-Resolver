@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
+import { Check, ChevronsUpDown, QrCode } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -20,6 +20,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Input } from "./input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./dialog";
+import { QrCodeScanner } from "../wallet-resolver/qr-code-scanner";
 
 const countries = [
   { value: "us", label: "🇺🇸 United States", code: "+1" },
@@ -43,6 +45,7 @@ export interface PhoneInputProps
 const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
   ({ className, value, onChange, ...props }, ref) => {
     const [open, setOpen] = React.useState(false)
+    const [scannerOpen, setScannerOpen] = React.useState(false);
     const [selectedCountry, setSelectedCountry] = React.useState(countries[0])
 
     const handleCountrySelect = (currentValue: string) => {
@@ -62,6 +65,22 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
       onChange?.(fullNumber);
     };
 
+    const handleQrScan = (scannedValue: string) => {
+        let phoneNumber = scannedValue;
+        if (phoneNumber.startsWith('tel:')) {
+            phoneNumber = phoneNumber.substring(4);
+        }
+        
+        const country = countries.find(c => phoneNumber.startsWith(c.code));
+        if (country) {
+            setSelectedCountry(country);
+            onChange?.(phoneNumber);
+        } else {
+             onChange?.(`${selectedCountry.code} ${phoneNumber}`);
+        }
+        setScannerOpen(false);
+    };
+
     const displayPhoneNumber = value?.replace(selectedCountry.code, '').trim() || '';
 
     return (
@@ -72,7 +91,7 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
               variant="outline"
               role="combobox"
               aria-expanded={open}
-              className="justify-between w-28 rounded-r-none"
+              className="justify-between w-28 rounded-r-none border-r-0"
             >
               {selectedCountry.label.split(' ')[0]}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -104,15 +123,36 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
             </Command>
           </PopoverContent>
         </Popover>
-        <Input
-            type="tel"
-            placeholder="555 123 4567"
-            className="rounded-l-none"
-            value={displayPhoneNumber}
-            onChange={handlePhoneNumberChange}
-            ref={ref}
-            {...props}
-        />
+        <div className="relative flex-grow">
+            <Input
+                type="tel"
+                placeholder="555 123 4567"
+                className="rounded-l-none pr-10"
+                value={displayPhoneNumber}
+                onChange={handlePhoneNumberChange}
+                ref={ref}
+                {...props}
+            />
+            <Dialog open={scannerOpen} onOpenChange={setScannerOpen}>
+                <DialogTrigger asChild>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute inset-y-0 right-0 h-full px-3"
+                        aria-label="Scan QR code"
+                    >
+                        <QrCode className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                </DialogTrigger>
+                <DialogContent>
+                     <DialogHeader>
+                        <DialogTitle>Scan QR Code</DialogTitle>
+                    </DialogHeader>
+                    <QrCodeScanner onScan={handleQrScan} />
+                </DialogContent>
+            </Dialog>
+        </div>
       </div>
     )
   }
@@ -120,4 +160,3 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
 PhoneInput.displayName = "PhoneInput";
 
 export { PhoneInput };
-

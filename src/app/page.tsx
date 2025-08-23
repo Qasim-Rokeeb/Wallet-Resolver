@@ -3,7 +3,7 @@ import { WalletResolverCard } from "@/components/wallet-resolver/wallet-resolver
 
 export default function Home() {
   return (
-    <main className="flex flex-col items-center bg-[#F5F5F5]">
+    <main className="flex flex-col items-center">
       <Hero />
       <div className="w-full flex justify-center py-12 md:py-24 px-4">
         <WalletResolverCard />

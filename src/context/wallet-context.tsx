@@ -7,7 +7,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 interface WalletContextType {
   walletAddress: string | null;
   connectWallet: (address: string) => void;
-  disconnectWallet: () => void;
+  disconnectWallet: (showToast?: boolean) => void;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -19,9 +19,12 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const storedAddress = localStorage.getItem(WALLET_ADDRESS_KEY);
-    if (storedAddress) {
-      setWalletAddress(storedAddress);
+    // This effect should only run for client-side rendering
+    if (typeof window !== 'undefined') {
+        const storedAddress = localStorage.getItem(WALLET_ADDRESS_KEY);
+        if (storedAddress) {
+        setWalletAddress(storedAddress);
+        }
     }
   }, []);
 
@@ -35,13 +38,15 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     })
   };
 
-  const disconnectWallet = () => {
+  const disconnectWallet = (showToast = true) => {
     setWalletAddress(null);
     localStorage.removeItem(WALLET_ADDRESS_KEY);
-    toast({
-        title: 'Wallet Disconnected',
-        description: 'Your wallet has been disconnected.',
-    });
+    if (showToast) {
+        toast({
+            title: 'Wallet Disconnected',
+            description: 'Your wallet has been disconnected.',
+        });
+    }
   };
 
   return (

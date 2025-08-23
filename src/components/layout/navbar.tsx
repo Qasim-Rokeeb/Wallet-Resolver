@@ -2,22 +2,28 @@
 "use client";
 
 import { useState } from 'react';
-import { Wallet, Menu, X, ChevronRight, LayoutDashboard, LogOut } from 'lucide-react';
+import { Wallet, Menu, X, ChevronRight, LayoutDashboard, LogOut, LogInIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { WalletConnectModal } from '../wallet-resolver/wallet-connect-modal';
 import { useWallet } from '@/context/wallet-context';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '../ui/avatar';
+import { useAuth } from '@/context/auth-context';
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { walletAddress, connectWallet, disconnectWallet } = useWallet();
+  const { isAuthenticated, logout } = useAuth();
 
   const handleConnect = (address: string) => {
     connectWallet(address);
   };
+  
+  const handleDisconnect = () => {
+    disconnectWallet();
+    logout();
+  }
   
   const truncateAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
@@ -44,7 +50,7 @@ export function Navbar() {
             <Link href="/#register" className="text-gray-600 hover:text-primary transition-colors font-medium">
               Register
             </Link>
-            {walletAddress ? (
+            {isAuthenticated && walletAddress ? (
                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline">
@@ -55,19 +61,26 @@ export function Navbar() {
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>{truncateAddress(walletAddress)}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={disconnectWallet}>
+                    <DropdownMenuItem onClick={handleDisconnect}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Disconnect</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-            ) : (
+            ) : isAuthenticated ? (
                 <WalletConnectModal onConnect={handleConnect}>
                     <Button>
                       <Wallet className="mr-2 h-4 w-4" />
                       Link Wallet
                     </Button>
                 </WalletConnectModal>
+            ) : (
+                <Button asChild>
+                  <Link href="/login">
+                    <LogInIcon className="mr-2 h-4 w-4" />
+                    Login
+                  </Link>
+                </Button>
             )}
           </div>
           <div className="md:hidden flex items-center">
@@ -121,18 +134,25 @@ export function Navbar() {
           </Link>
         </div>
         <div className="p-4 border-t border-gray-200">
-           {walletAddress ? (
-               <Button variant="outline" className="w-full" onClick={disconnectWallet}>
+           {isAuthenticated && walletAddress ? (
+               <Button variant="outline" className="w-full" onClick={handleDisconnect}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Disconnect ({truncateAddress(walletAddress)})
                 </Button>
-           ) : (
+           ) : isAuthenticated ? (
              <WalletConnectModal onConnect={handleConnect}>
                 <Button className="w-full" onClick={() => setIsMenuOpen(false)}>
                   <Wallet className="mr-2 h-4 w-4" />
                   Link Wallet
                 </Button>
               </WalletConnectModal>
+           ) : (
+             <Button asChild className="w-full">
+               <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                 <LogInIcon className="mr-2 h-4 w-4" />
+                 Login
+               </Link>
+             </Button>
            )}
         </div>
       </div>

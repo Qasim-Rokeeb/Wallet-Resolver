@@ -1,6 +1,8 @@
 
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Footer } from "@/components/layout/footer";
 import { Sidebar, SidebarProvider, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { LayoutDashboard, Send, UserPlus, Home, Wallet, User, Settings, LogOut, CheckCircle, AlertTriangle } from "lucide-react";
@@ -12,7 +14,8 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePhoneVerification } from "@/context/phone-verification-context";
-import { Badge } from "@/components/ui/badge";
+import { useAuth } from '@/context/auth-context';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 export default function DashboardLayout({
   children,
@@ -20,9 +23,25 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
     const pathname = usePathname();
+    const router = useRouter();
+    const { isAuthenticated, isLoading, logout } = useAuth();
     const isActive = (path: string) => pathname === path;
     const breadcrumbs = useBreadcrumbs();
     const { isPhoneVerified } = usePhoneVerification();
+
+    useEffect(() => {
+        if (!isLoading && !isAuthenticated) {
+            router.push('/login');
+        }
+    }, [isLoading, isAuthenticated, router]);
+
+    if (isLoading || !isAuthenticated) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <LoadingSpinner className="h-12 w-12" />
+            </div>
+        );
+    }
 
   return (
     <SidebarProvider>
@@ -121,7 +140,7 @@ export default function DashboardLayout({
                                     <span>Settings</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={logout}>
                                     <LogOut className="mr-2 h-4 w-4" />
                                     <span>Log out</span>
                                 </DropdownMenuItem>

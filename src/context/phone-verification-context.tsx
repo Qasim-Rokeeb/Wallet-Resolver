@@ -17,9 +17,12 @@ export const PhoneVerificationProvider = ({ children }: { children: ReactNode })
   const [isPhoneVerified, setIsPhoneVerified] = useState<boolean>(false);
 
   useEffect(() => {
-    const storedStatus = localStorage.getItem(PHONE_VERIFIED_KEY);
-    if (storedStatus === 'true') {
-      setIsPhoneVerified(true);
+    // This effect should only run for client-side rendering
+    if (typeof window !== 'undefined') {
+        const storedStatus = localStorage.getItem(PHONE_VERIFIED_KEY);
+        if (storedStatus === 'true') {
+            setIsPhoneVerified(true);
+        }
     }
   }, []);
 

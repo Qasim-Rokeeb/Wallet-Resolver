@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { CheckCircle, AlertTriangle, ArrowLeft, Loader2 } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Skeleton } from '../ui/skeleton';
@@ -27,11 +27,22 @@ interface OtpFormProps {
 function OtpFormSkeleton() {
     return (
         <div className="space-y-6 flex flex-col items-center">
-            <Skeleton className="h-4 w-2/3" />
-            <Skeleton className="h-4 w-1/2" />
-            <Skeleton className="h-12 w-48" />
+            <Skeleton className="h-6 w-2/3" />
+            <p className="text-sm text-muted-foreground mt-1">
+                <Skeleton className="h-4 w-48" />
+            </p>
+            <div className="flex gap-2">
+                <Skeleton className="h-10 w-10" />
+                <Skeleton className="h-10 w-10" />
+                <Skeleton className="h-10 w-10" />
+                <Skeleton className="h-10 w-10" />
+                <Skeleton className="h-10 w-10" />
+                <Skeleton className="h-10 w-10" />
+            </div>
+            <Skeleton className="h-4 w-40" />
             <Skeleton className="h-11 w-full" />
-            <Skeleton className="h-4 w-1/3" />
+            <Skeleton className="h-9 w-36" />
+            <Skeleton className="h-9 w-48" />
         </div>
     )
 }
@@ -153,9 +164,13 @@ export function OtpForm({ phone, onSuccess, onBack }: OtpFormProps) {
           )}
         </div>
         
-        <Button type="submit" className="w-full" disabled={isExpired}>
-          <CheckCircle className="mr-2 h-4 w-4" />
-          Verify
+        <Button type="submit" className="w-full" disabled={isExpired || loading}>
+            {loading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+                <CheckCircle className="mr-2 h-4 w-4" />
+            )}
+            {loading ? 'Verifying...' : 'Verify'}
         </Button>
 
         <div className="text-center space-y-2">

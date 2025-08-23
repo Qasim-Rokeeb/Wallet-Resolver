@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, AlertTriangle, ArrowLeft, Loader2 } from 'lucide-react';
+import { CheckCircle, AlertTriangle, ArrowLeft, Loader2, RefreshCw } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Skeleton } from '../ui/skeleton';
@@ -52,6 +52,8 @@ export function OtpForm({ phone, onSuccess, onBack }: OtpFormProps) {
   const [loading, setLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(30);
   const [expirationTime, setExpirationTime] = useState(300); // 5 minutes
+  const [verificationFailed, setVerificationFailed] = useState(false);
+
 
   const form = useForm<OtpFormValues>({
     resolver: zodResolver(otpFormSchema),
@@ -92,6 +94,8 @@ export function OtpForm({ phone, onSuccess, onBack }: OtpFormProps) {
     });
     setResendCooldown(30);
     setExpirationTime(300);
+    setVerificationFailed(false);
+    form.reset();
   };
 
   const handleSubmit = (values: OtpFormValues) => {
@@ -101,6 +105,7 @@ export function OtpForm({ phone, onSuccess, onBack }: OtpFormProps) {
         console.log(values);
 
         if (values.otp === "123456") { // Mock success
+            setVerificationFailed(false);
             onSuccess();
         } else {
              toast({
@@ -108,10 +113,17 @@ export function OtpForm({ phone, onSuccess, onBack }: OtpFormProps) {
                 description: 'The code you entered is incorrect. Please try again.',
                 variant: 'destructive',
             });
+            setVerificationFailed(true);
+            form.reset();
         }
         setLoading(false);
     }, 2000);
   };
+
+  const handleTryAgain = () => {
+    setVerificationFailed(false);
+    form.reset();
+  }
   
   if (loading) {
     return <OtpFormSkeleton />;
@@ -138,7 +150,7 @@ export function OtpForm({ phone, onSuccess, onBack }: OtpFormProps) {
             <FormItem className="flex flex-col items-center">
               <FormLabel className="sr-only">One-Time Password</FormLabel>
               <FormControl>
-                <InputOTP maxLength={6} {...field} disabled={isExpired}>
+                <InputOTP maxLength={6} {...field} disabled={isExpired || verificationFailed}>
                     <InputOTPGroup>
                         <InputOTPSlot index={0} />
                         <InputOTPSlot index={1} />
@@ -164,14 +176,21 @@ export function OtpForm({ phone, onSuccess, onBack }: OtpFormProps) {
           )}
         </div>
         
-        <Button type="submit" className="w-full" disabled={isExpired || loading}>
-            {loading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-                <CheckCircle className="mr-2 h-4 w-4" />
-            )}
-            {loading ? 'Verifying...' : 'Verify'}
-        </Button>
+        {verificationFailed ? (
+            <Button type="button" variant="destructive" className="w-full" onClick={handleTryAgain}>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Try Again
+            </Button>
+        ) : (
+            <Button type="submit" className="w-full" disabled={isExpired || loading}>
+                {loading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                )}
+                {loading ? 'Verifying...' : 'Verify'}
+            </Button>
+        )}
 
         <div className="text-center space-y-2">
              <Button

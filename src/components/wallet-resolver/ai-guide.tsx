@@ -1,35 +1,28 @@
+
 "use client";
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { HelpCircle, Loader2 } from 'lucide-react';
-import { getAIGuide } from '@/app/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 
-type Task = 'add' | 'resolve';
-
 export function AIGuide() {
   const [guide, setGuide] = useState<string | null>(null);
-  const [loadingTask, setLoadingTask] = useState<Task | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [loadingTask, setLoadingTask] = useState<string | null>(null);
 
-  const handleFetchGuide = async (task: Task) => {
+  const handleFetchGuide = async (task: 'add' | 'resolve') => {
     setLoadingTask(task);
-    setError(null);
     setGuide(null);
-    try {
-      const result = await getAIGuide(task);
-      const formattedGuide = result.guide
-        .replace(/\n/g, '<br />')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      setGuide(formattedGuide);
-    } catch (e) {
-      setError('Failed to load guide. Please try again.');
-    } finally {
-      setLoadingTask(null);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    if (task === 'add') {
+      setGuide('To register, connect your wallet, enter your phone number, and click "Register Phone".');
+    } else {
+      setGuide('To send a payment, enter the recipient\'s phone number, the amount, and click "Send Payment".');
     }
+    setLoadingTask(null);
   };
 
   return (
@@ -41,9 +34,9 @@ export function AIGuide() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>AI-Powered Quick Start</DialogTitle>
+          <DialogTitle>Quick Start Guide</DialogTitle>
           <DialogDescription>
-            Get a quick guide on how to use Wallet Resolver. Select a topic below.
+            Get a quick guide on how to use Wallet Resolver.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -69,13 +62,12 @@ export function AIGuide() {
               How to Send
             </Button>
           </div>
-          {(loadingTask || error || guide) && <Separator />}
-          {error && <Alert variant="destructive"><AlertTitle>Error</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
+          {(loadingTask || guide) && <Separator />}
           {guide && (
              <Alert>
               <AlertTitle>Quick Start Guide</AlertTitle>
               <AlertDescription>
-                <div className="prose prose-sm max-w-none dark:prose-invert" dangerouslySetInnerHTML={{ __html: guide }} />
+                {guide}
               </AlertDescription>
             </Alert>
           )}

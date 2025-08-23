@@ -3,11 +3,14 @@
 
 import { Footer } from "@/components/layout/footer";
 import { Sidebar, SidebarProvider, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { LayoutDashboard, Send, UserPlus, Home, Wallet } from "lucide-react";
+import { LayoutDashboard, Send, UserPlus, Home, Wallet, User, Settings, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { Breadcrumbs } from "@/components/ui/breadcrumb";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function DashboardLayout({
   children,
@@ -70,8 +73,44 @@ export default function DashboardLayout({
                         </div>
                         <Breadcrumbs segments={breadcrumbs} />
                     </div>
-                    <div className="hidden md:block">
-                        <SidebarTrigger />
+                    <div className="flex items-center gap-4">
+                        <div className="hidden md:block">
+                            <SidebarTrigger />
+                        </div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                                    <Avatar className="h-10 w-10">
+                                        <AvatarImage src="https://placehold.co/100x100.png" alt="User Avatar" />
+                                        <AvatarFallback>U</AvatarFallback>
+                                    </Avatar>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56" align="end" forceMount>
+                                <DropdownMenuLabel className="font-normal">
+                                    <div className="flex flex-col space-y-1">
+                                        <p className="text-sm font-medium leading-none">User</p>
+                                        <p className="text-xs leading-none text-muted-foreground">
+                                            user@example.com
+                                        </p>
+                                    </div>
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem>
+                                    <User className="mr-2 h-4 w-4" />
+                                    <span>Profile</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    <span>Settings</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem>
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Log out</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </header>
                 <main className="flex-grow p-4 md:p-6 lg:p-8">

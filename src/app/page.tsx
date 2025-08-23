@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <main className="flex flex-col items-center">
       <Hero />
-      <div className="w-full flex justify-center py-12 md:py-24 px-4">
+      <div className="w-full flex justify-center py-12 px-4 md:py-24">
         <WalletResolverCard />
       </div>
     </main>

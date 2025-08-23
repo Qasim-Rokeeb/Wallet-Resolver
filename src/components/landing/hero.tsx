@@ -8,7 +8,7 @@ import { ArrowRight } from "lucide-react"
 export function Hero() {
   return (
     <section className="w-full bg-white/50 border-b backdrop-blur-sm">
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center px-4 sm:px-6 lg:px-8 py-20 md:py-32">
+      <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center px-4 sm:px-6 lg:px-8 py-16 md:py-24">
         <div className="space-y-6 text-center md:text-left">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-primary">
             The Future of Crypto Payments is Here
@@ -32,11 +32,11 @@ export function Hero() {
         </div>
         <div className="flex justify-center items-center">
             <Image
-                src="https://placehold.co/600x400.png"
+                src="https://placehold.co/550x400.png"
                 alt="Digital wallet illustration"
-                width={600}
+                width={550}
                 height={400}
-                className="rounded-xl shadow-2xl"
+                className="rounded-xl shadow-2xl w-full max-w-md"
                 data-ai-hint="digital wallet payment"
             />
         </div>

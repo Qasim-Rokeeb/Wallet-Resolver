@@ -18,6 +18,9 @@ import { WalletConnectModal } from './wallet-connect-modal';
 import { useWallet } from '@/context/wallet-context';
 import { usePhoneVerification } from '@/context/phone-verification-context';
 import { useRouter } from 'next/navigation';
+import { Checkbox } from '../ui/checkbox';
+import { Label } from '../ui/label';
+import Link from 'next/link';
 
 const registerFormSchema = z.object({
     phone: z.string().refine(value => {
@@ -104,6 +107,7 @@ export function RegisterForm() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const { walletAddress, connectWallet } = useWallet();
   const { verifyPhone } = usePhoneVerification();
+  const [hasConsented, setHasConsented] = useState(false);
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
@@ -239,7 +243,21 @@ export function RegisterForm() {
                 </FormItem>
                 )}
             />
-            <Button type="submit" className="w-full">
+            <div className="flex items-start space-x-3">
+                <Checkbox id="terms-register" checked={hasConsented} onCheckedChange={(checked) => setHasConsented(checked as boolean)} />
+                <Label htmlFor="terms-register" className="text-sm text-muted-foreground -mt-0.5">
+                    I agree to the{" "}
+                    <Link href="#" className="underline underline-offset-4 hover:text-primary">
+                        Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link href="#" className="underline underline-offset-4 hover:text-primary">
+                        Privacy Policy
+                    </Link>
+                    .
+                </Label>
+            </div>
+            <Button type="submit" className="w-full" disabled={!hasConsented}>
                 <UserPlus className="mr-2 h-4 w-4" />
                 Register Phone
             </Button>

@@ -1,14 +1,33 @@
 
 "use client";
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Send } from 'lucide-react';
+import { Skeleton } from '../ui/skeleton';
+
+function SendFormSkeleton() {
+    return (
+        <div className="space-y-6">
+            <div className="space-y-2">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+                <Skeleton className="h-4 w-1/4" />
+                <Skeleton className="h-10 w-full" />
+            </div>
+            <Skeleton className="h-11 w-full" />
+        </div>
+    )
+}
 
 export function SendForm() {
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -25,15 +44,23 @@ export function SendForm() {
       return;
     }
     
-    // TODO: Add actual send logic
-    console.log({ phone, amount });
+    setLoading(true);
+    setTimeout(() => {
+        // TODO: Add actual send logic
+        console.log({ phone, amount });
 
-    toast({
-      title: 'Payment Sent!',
-      description: `Successfully sent ${amount} ETH to ${phone}.`,
-      variant: 'success',
-    });
+        toast({
+        title: 'Payment Sent!',
+        description: `Successfully sent ${amount} ETH to ${phone}.`,
+        variant: 'success',
+        });
+        setLoading(false);
+    }, 2000);
   };
+
+  if (loading) {
+      return <SendFormSkeleton />;
+  }
 
 
   return (

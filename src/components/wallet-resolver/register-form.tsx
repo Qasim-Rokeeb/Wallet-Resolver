@@ -1,14 +1,35 @@
 
 "use client";
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { UserPlus, Wallet } from 'lucide-react';
+import { Skeleton } from '../ui/skeleton';
+
+function RegisterFormSkeleton() {
+  return (
+    <div className="space-y-6">
+        <Skeleton className="h-11 w-full" />
+        <div className="space-y-2">
+            <Skeleton className="h-4 w-1/3" />
+            <Skeleton className="h-10 w-full" />
+        </div>
+        <div className="space-y-2">
+            <Skeleton className="h-4 w-1/4" />
+            <Skeleton className="h-10 w-full" />
+        </div>
+        <Skeleton className="h-11 w-full" />
+    </div>
+  )
+}
+
 
 export function RegisterForm() {
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -25,16 +46,23 @@ export function RegisterForm() {
       return;
     }
     
-    // TODO: Add actual registration logic
-    console.log({ phone, walletAddress });
+    setLoading(true);
+    setTimeout(() => {
+        // TODO: Add actual registration logic
+        console.log({ phone, walletAddress });
 
-    toast({
-      title: 'Success!',
-      description: 'Your phone number has been registered.',
-      variant: 'success',
-    });
+        toast({
+        title: 'Success!',
+        description: 'Your phone number has been registered.',
+        variant: 'success',
+        });
+        setLoading(false);
+    }, 2000);
   };
 
+  if (loading) {
+    return <RegisterFormSkeleton />;
+  }
 
   return (
     <form onSubmit={handleSubmit}>

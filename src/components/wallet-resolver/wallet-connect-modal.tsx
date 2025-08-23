@@ -13,6 +13,9 @@ import { useWallet } from '@/context/wallet-context';
 import { Loader2, ShieldQuestion } from 'lucide-react';
 import { Separator } from '../ui/separator';
 import { WalletSecurityInfo } from './wallet-security-info';
+import { Checkbox } from '../ui/checkbox';
+import { Label } from '../ui/label';
+import Link from 'next/link';
 
 const walletProviders = [
     { name: 'MetaMask', icon: MetamaskIcon },
@@ -30,6 +33,7 @@ export function WalletConnectModal({ children, onConnect }: WalletConnectModalPr
     const { toast } = useToast();
     const [isOpen, setIsOpen] = useState(false);
     const [loadingWallet, setLoadingWallet] = useState<string | null>(null);
+    const [hasConsented, setHasConsented] = useState(false);
     const { connectWallet } = useWallet();
 
     const handleWalletConnect = (walletName: string) => {
@@ -63,6 +67,7 @@ export function WalletConnectModal({ children, onConnect }: WalletConnectModalPr
         setIsOpen(open);
         if (!open) {
             setLoadingWallet(null);
+            setHasConsented(false); // Reset consent on close
         }
     }
 
@@ -85,7 +90,7 @@ export function WalletConnectModal({ children, onConnect }: WalletConnectModalPr
                                 variant="outline"
                                 className="w-full justify-start h-14 text-base gap-4 px-4"
                                 onClick={() => handleWalletConnect(provider.name)}
-                                disabled={isLoading || (loadingWallet !== null && loadingWallet !== provider.name)}
+                                disabled={!hasConsented || isLoading || (loadingWallet !== null && loadingWallet !== provider.name)}
                             >
                                {isLoading ? (
                                     <Loader2 className="h-8 w-8 animate-spin" />
@@ -96,6 +101,20 @@ export function WalletConnectModal({ children, onConnect }: WalletConnectModalPr
                             </Button>
                         )
                     })}
+                </div>
+                <div className="flex items-center space-x-2 py-2">
+                    <Checkbox id="terms" checked={hasConsented} onCheckedChange={(checked) => setHasConsented(checked as boolean)} />
+                    <Label htmlFor="terms" className="text-sm text-muted-foreground">
+                        I agree to the{" "}
+                        <Link href="#" className="underline underline-offset-4 hover:text-primary">
+                            Terms of Service
+                        </Link>{" "}
+                        and{" "}
+                        <Link href="#" className="underline underline-offset-4 hover:text-primary">
+                            Privacy Policy
+                        </Link>
+                        .
+                    </Label>
                 </div>
                 <Separator className="my-2" />
                  <Dialog>

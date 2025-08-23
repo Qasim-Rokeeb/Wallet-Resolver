@@ -14,19 +14,19 @@ export function WalletResolverCard() {
   return (
     <>
       <div id="send" className="scroll-mt-20">
-        <Card className="w-full max-w-md shadow-2xl rounded-2xl overflow-hidden border-2 border-gray-200/60">
-          <CardHeader className="text-center bg-white p-6 relative border-b">
+        <Card className="w-full max-w-md shadow-2xl rounded-2xl overflow-hidden border-2 border-primary/10">
+          <CardHeader className="text-center p-6 relative">
             <CardTitle className="text-3xl font-bold text-primary">Wallet Resolver</CardTitle>
-            <CardDescription className="text-base text-gray-500">Send crypto using just a phone number.</CardDescription>
+            <CardDescription className="text-base text-muted-foreground pt-1">Send crypto using just a phone number.</CardDescription>
             <div className="absolute top-3 right-3">
               <AIGuide />
             </div>
           </CardHeader>
-          <CardContent className="p-6 bg-gray-50">
+          <CardContent className="p-6 bg-secondary/30">
             <Tabs defaultValue="send" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 bg-gray-200/70">
-                <TabsTrigger value="send" className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-md">Send</TabsTrigger>
-                <TabsTrigger value="register" className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-md">Register</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="send">Send</TabsTrigger>
+                <TabsTrigger value="register">Register</TabsTrigger>
               </TabsList>
               <TabsContent value="send" className="pt-6">
                 <SendForm />

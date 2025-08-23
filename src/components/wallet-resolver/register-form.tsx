@@ -12,6 +12,7 @@ import { UserPlus, Wallet, Copy } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PhoneInput } from '../ui/phone-input';
+import { OtpForm } from './otp-form';
 
 const registerFormSchema = z.object({
     phone: z.string().refine(value => {
@@ -47,6 +48,9 @@ function RegisterFormSkeleton() {
 export function RegisterForm() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [showOtpForm, setShowOtpForm] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
@@ -69,21 +73,36 @@ export function RegisterForm() {
   const handleSubmit = (values: RegisterFormValues) => {
     setLoading(true);
     setTimeout(() => {
-        // TODO: Add actual registration logic
+        // TODO: Add actual registration logic to send OTP
         console.log(values);
 
         toast({
-        title: 'Success!',
-        description: 'Your phone number has been registered.',
-        variant: 'success',
+            title: 'OTP Sent!',
+            description: 'A verification code has been sent to your phone.',
+            variant: 'success',
         });
+        setPhoneNumber(values.phone);
         setLoading(false);
-        form.reset();
+        setShowOtpForm(true);
     }, 2000);
   };
 
+  const handleOtpSuccess = () => {
+    setShowOtpForm(false);
+    form.reset();
+    toast({
+        title: 'Success!',
+        description: 'Your phone number has been registered.',
+        variant: 'success',
+    });
+  }
+
   if (loading) {
     return <RegisterFormSkeleton />;
+  }
+
+  if (showOtpForm) {
+    return <OtpForm phone={phoneNumber} onSuccess={handleOtpSuccess} />;
   }
 
   return (

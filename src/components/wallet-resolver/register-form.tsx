@@ -14,7 +14,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { PhoneInput } from '../ui/phone-input';
 
 const registerFormSchema = z.object({
-    phone: z.string().min(10, { message: "Phone number must be at least 10 digits." }),
+    phone: z.string().refine(value => {
+        const parts = value.split(' ');
+        if (parts.length < 2) return false;
+        const number = parts.slice(1).join('');
+        return /^\d{7,15}$/.test(number);
+    }, { message: "Please enter a valid phone number." }),
     walletAddress: z.string().min(1, { message: "Wallet address cannot be empty." }),
 });
 

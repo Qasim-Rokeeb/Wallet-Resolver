@@ -21,12 +21,16 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { PhoneInput } from '../ui/phone-input';
 
 const sendFormSchema = z.object({
-  phone: z.string().min(10, { message: "Phone number must be at least 10 digits." }),
+  phone: z.string().refine(value => {
+        const parts = value.split(' ');
+        if (parts.length < 2) return false;
+        const number = parts.slice(1).join('');
+        return /^\d{7,15}$/.test(number);
+    }, { message: "Please enter a valid phone number." }),
   amount: z.coerce.number().positive({ message: "Amount must be positive." }),
 });
 
@@ -52,6 +56,8 @@ function SendFormSkeleton() {
 export function SendForm() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+
   const form = useForm<SendFormValues>({
     resolver: zodResolver(sendFormSchema),
     defaultValues: {
@@ -62,6 +68,7 @@ export function SendForm() {
 
   const handleSubmit = (values: SendFormValues) => {
     setLoading(true);
+    setIsAlertOpen(false);
     setTimeout(() => {
         // TODO: Add actual send logic
         console.log(values);
@@ -96,7 +103,7 @@ export function SendForm() {
                       <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Enter the 10-digit phone number of the recipient.</p>
+                      <p>Enter the phone number of the recipient.</p>
                     </TooltipContent>
                   </Tooltip>
               </div>
@@ -120,13 +127,11 @@ export function SendForm() {
             </FormItem>
           )}
         />
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button type="button" className="w-full">
+        <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+            <Button type="button" className="w-full" onClick={() => form.trigger().then(isValid => isValid && setIsAlertOpen(true))}>
               <Send className="mr-2 h-4 w-4" />
               Send Payment
             </Button>
-          </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Confirm Payment</AlertDialogTitle>

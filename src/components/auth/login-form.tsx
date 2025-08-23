@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { LogIn, CheckCircle } from 'lucide-react';
+import { LogIn, Fingerprint } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PhoneInput } from '../ui/phone-input';
 import { OtpForm } from '../wallet-resolver/otp-form';
@@ -15,6 +15,7 @@ import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
 import { useWallet } from '@/context/wallet-context';
 import { usePhoneVerification } from '@/context/phone-verification-context';
+import { Separator } from '../ui/separator';
 
 const loginFormSchema = z.object({
     phone: z.string().refine(value => {
@@ -77,30 +78,56 @@ export function LoginForm() {
     router.push('/dashboard');
   };
 
+  const handleBiometricClick = () => {
+    toast({
+        title: 'Coming Soon!',
+        description: 'Biometric login is a future feature.',
+        variant: 'info'
+    });
+  }
+
   if (showOtpForm) {
     return <OtpForm phone={phoneNumber} onSuccess={handleOtpSuccess} />;
   }
 
   return (
-    <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Your Phone Number</FormLabel>
-                    <FormControl>
-                    <PhoneInput {...field} />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-                )}
-            />
-            <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Sending...' : <><LogIn className="mr-2 h-4 w-4" /> Send OTP</>}
-            </Button>
-        </form>
-    </Form>
+    <div className="space-y-6">
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+                <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Your Phone Number</FormLabel>
+                        <FormControl>
+                        <PhoneInput {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? 'Sending...' : <><LogIn className="mr-2 h-4 w-4" /> Send OTP</>}
+                </Button>
+            </form>
+        </Form>
+
+        <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                Or
+                </span>
+            </div>
+        </div>
+
+        <Button variant="outline" className="w-full" onClick={handleBiometricClick}>
+            <Fingerprint className="mr-2 h-4 w-4" />
+            Sign in with biometrics
+        </Button>
+    </div>
   );
 }

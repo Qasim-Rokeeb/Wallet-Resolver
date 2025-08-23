@@ -12,6 +12,17 @@ import { Send, Info } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 const sendFormSchema = z.object({
   phone: z.string().min(10, { message: "Phone number must be at least 10 digits." }),
@@ -108,10 +119,28 @@ export function SendForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">
-          <Send className="mr-2 h-4 w-4" />
-          Send Payment
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button type="button" className="w-full">
+              <Send className="mr-2 h-4 w-4" />
+              Send Payment
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm Payment</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to send {form.getValues().amount} ETH to {form.getValues().phone}? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => form.handleSubmit(handleSubmit)()}>
+                Confirm
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </form>
     </Form>
   );

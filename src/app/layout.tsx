@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { Navbar } from '@/components/layout/navbar';
 import { AlertBanner } from '@/components/layout/alert-banner';
 import { Footer } from '@/components/layout/footer';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
@@ -24,15 +25,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} flex flex-col min-h-screen`}>
-        <Navbar />
-        <AlertBanner 
-          title="Beta Notice:"
-          description="This is a demo application. Do not use real wallet information."
-          initiallyVisible={true}
-        />
-        <main className="flex-grow">{children}</main>
-        <Footer />
-        <Toaster />
+        <TooltipProvider>
+          <Navbar />
+          <AlertBanner 
+            title="Beta Notice:"
+            description="This is a demo application. Do not use real wallet information."
+            initiallyVisible={true}
+          />
+          <main className="flex-grow">{children}</main>
+          <Footer />
+          <Toaster />
+        </TooltipProvider>
       </body>
     </html>
   );

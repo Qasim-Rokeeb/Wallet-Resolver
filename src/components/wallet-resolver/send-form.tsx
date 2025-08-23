@@ -8,9 +8,10 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Send } from 'lucide-react';
+import { Send, Info } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const sendFormSchema = z.object({
   phone: z.string().min(10, { message: "Phone number must be at least 10 digits." }),
@@ -76,7 +77,17 @@ export function SendForm() {
           name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Recipient's Phone Number</FormLabel>
+              <div className="flex items-center gap-2">
+                <FormLabel>Recipient's Phone Number</FormLabel>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Enter the 10-digit phone number of the recipient.</p>
+                    </TooltipContent>
+                  </Tooltip>
+              </div>
               <FormControl>
                 <Input type="tel" placeholder="+1 (555) 123-4567" {...field} />
               </FormControl>

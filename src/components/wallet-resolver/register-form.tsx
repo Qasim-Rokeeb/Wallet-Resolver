@@ -8,7 +8,7 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Wallet, Copy } from 'lucide-react';
+import { UserPlus, Wallet, Copy, ArrowRight } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PhoneInput } from '../ui/phone-input';
@@ -17,6 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { WalletConnectModal } from './wallet-connect-modal';
 import { useWallet } from '@/context/wallet-context';
 import { usePhoneVerification } from '@/context/phone-verification-context';
+import { useRouter } from 'next/navigation';
 
 const registerFormSchema = z.object({
     phone: z.string().refine(value => {
@@ -86,7 +87,7 @@ function SuccessScreen({ onDone }: { onDone: () => void }) {
                     Your phone number has been successfully verified and linked to your wallet address.
                 </CardDescription>
                 <Button onClick={onDone} className="w-full" size="lg">
-                    Done
+                    Go to Dashboard <ArrowRight className="ml-2" />
                 </Button>
             </CardContent>
         </Card>
@@ -96,6 +97,7 @@ function SuccessScreen({ onDone }: { onDone: () => void }) {
 
 export function RegisterForm() {
   const { toast } = useToast();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showOtpForm, setShowOtpForm] = useState(false);
   const [showSuccessScreen, setShowSuccessScreen] = useState(false);
@@ -164,8 +166,14 @@ export function RegisterForm() {
   }
 
   const handleDone = () => {
-    setShowSuccessScreen(false);
-    form.reset({ phone: '', walletAddress: walletAddress || ''});
+    toast({
+      title: 'Success!',
+      description: 'Redirecting you to the dashboard...',
+      variant: 'success',
+    });
+    setTimeout(() => {
+      router.push('/dashboard');
+    }, 1000);
   }
 
   if (loading) {

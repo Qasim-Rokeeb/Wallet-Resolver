@@ -10,6 +10,7 @@ import { LedgerIcon } from '../icons/ledger';
 import { MetamaskIcon } from '../icons/metamask';
 import { WalletConnectIcon } from '../icons/walletconnect';
 import { useWallet } from '@/context/wallet-context';
+import { Loader2 } from 'lucide-react';
 
 const walletProviders = [
     { name: 'MetaMask', icon: MetamaskIcon },
@@ -26,9 +27,11 @@ interface WalletConnectModalProps {
 export function WalletConnectModal({ children, onConnect }: WalletConnectModalProps) {
     const { toast } = useToast();
     const [isOpen, setIsOpen] = useState(false);
+    const [loadingWallet, setLoadingWallet] = useState<string | null>(null);
     const { connectWallet } = useWallet();
 
     const handleWalletConnect = (walletName: string) => {
+        setLoadingWallet(walletName);
         console.log(`Connecting with ${walletName}...`);
         // Mock connection logic
         setTimeout(() => {
@@ -43,12 +46,20 @@ export function WalletConnectModal({ children, onConnect }: WalletConnectModalPr
             } else {
                 connectWallet(mockAddress);
             }
+            setLoadingWallet(null);
             setIsOpen(false);
         }, 1500);
     };
 
+    const handleOpenChange = (open: boolean) => {
+        setIsOpen(open);
+        if (!open) {
+            setLoadingWallet(null);
+        }
+    }
+
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>{children}</DialogTrigger>
             <DialogContent className="sm:max-w-sm">
                 <DialogHeader>
@@ -58,17 +69,25 @@ export function WalletConnectModal({ children, onConnect }: WalletConnectModalPr
                     </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col space-y-2 pt-4">
-                    {walletProviders.map((provider) => (
-                        <Button
-                            key={provider.name}
-                            variant="outline"
-                            className="w-full justify-start h-14 text-base gap-4 px-4"
-                            onClick={() => handleWalletConnect(provider.name)}
-                        >
-                           <provider.icon className="h-8 w-8" />
-                           <span>{provider.name}</span>
-                        </Button>
-                    ))}
+                    {walletProviders.map((provider) => {
+                        const isLoading = loadingWallet === provider.name;
+                        return (
+                            <Button
+                                key={provider.name}
+                                variant="outline"
+                                className="w-full justify-start h-14 text-base gap-4 px-4"
+                                onClick={() => handleWalletConnect(provider.name)}
+                                disabled={isLoading || (loadingWallet !== null && loadingWallet !== provider.name)}
+                            >
+                               {isLoading ? (
+                                    <Loader2 className="h-8 w-8 animate-spin" />
+                                ) : (
+                                    <provider.icon className="h-8 w-8" />
+                                )}
+                               <span>{provider.name}</span>
+                            </Button>
+                        )
+                    })}
                 </div>
             </DialogContent>
         </Dialog>

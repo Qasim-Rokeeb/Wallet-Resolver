@@ -18,21 +18,22 @@ export function SessionExpirationModal({ isOpen, onExtend, onLogout }: SessionEx
   const [countdown, setCountdown] = useState(MODAL_COUNTDOWN_SECONDS);
 
   useEffect(() => {
+    let timer: NodeJS.Timeout;
     if (isOpen) {
       setCountdown(MODAL_COUNTDOWN_SECONDS);
-      const timer = setInterval(() => {
+      timer = setInterval(() => {
         setCountdown((prevCountdown) => {
           if (prevCountdown <= 1) {
             clearInterval(timer);
-            onLogout();
+            // The logout is handled by the auth context timeout, so we don't call it here.
             return 0;
           }
           return prevCountdown - 1;
         });
       }, 1000);
-      
-      return () => clearInterval(timer);
     }
+    
+    return () => clearInterval(timer);
   }, [isOpen, onLogout]);
   
   if (!isOpen) {
@@ -64,7 +65,7 @@ export function SessionExpirationModal({ isOpen, onExtend, onLogout }: SessionEx
         </div>
         <DialogFooter className="grid grid-cols-2 gap-2">
           <Button variant="outline" onClick={onLogout}>
-            <LogOut />
+            <LogOut className="mr-2" />
             Log Out Now
           </Button>
           <Button onClick={onExtend}>

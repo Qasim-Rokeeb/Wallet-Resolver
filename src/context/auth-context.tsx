@@ -9,7 +9,7 @@ import { useTransaction } from './transaction-context';
 import { SessionExpirationModal } from '@/components/auth/session-expiration-modal';
 
 const SESSION_DURATION = 15 * 60 * 1000; // 15 minutes
-const MODAL_TIMEOUT = 2 * 60 * 1000; // 2 minutes
+const MODAL_TIMEOUT = 2 * 60 * 1000; // 2 minutes before logout after modal shows
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -52,21 +52,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         description: 'You have been successfully logged out.',
     });
     
-    // Cleanup timers
+    // Cleanup timers and modal state
     if (sessionTimeoutId) clearTimeout(sessionTimeoutId);
     if (modalTimeoutId) clearTimeout(modalTimeoutId);
+    setSessionTimeoutId(null);
+    setModalTimeoutId(null);
     setShowExpirationModal(false);
   }, [walletContext, phoneVerificationContext, transactionContext, toast, sessionTimeoutId, modalTimeoutId]);
 
-  const resetSession = useCallback(() => {
+  const extendSession = useCallback(() => {
+    // This is the auto-refresh handler. It silently extends the session.
     if (sessionTimeoutId) clearTimeout(sessionTimeoutId);
     if (modalTimeoutId) clearTimeout(modalTimeoutId);
     
     setShowExpirationModal(false);
 
     if (isAuthenticated) {
+        // Set a new timer to show the expiration modal after inactivity
         const newSessionTimeout = setTimeout(() => {
             setShowExpirationModal(true);
+            // After modal is shown, set another timer to auto-logout
             const newModalTimeout = setTimeout(logout, MODAL_TIMEOUT);
             setModalTimeoutId(newModalTimeout);
         }, SESSION_DURATION);
@@ -75,23 +80,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [isAuthenticated, sessionTimeoutId, modalTimeoutId, logout]);
 
   useEffect(() => {
-    const events = ['mousemove', 'keydown', 'mousedown', 'touchstart'];
+    // These events are used to detect user activity
+    const activityEvents: (keyof WindowEventMap)[] = ['mousemove', 'keydown', 'mousedown', 'touchstart'];
     
-    const reset = () => resetSession();
+    const activityHandler = () => extendSession();
 
     if (isAuthenticated) {
-        events.forEach(event => window.addEventListener(event, reset));
-        resetSession();
+        // Add listeners for user activity
+        activityEvents.forEach(event => window.addEventListener(event, activityHandler));
+        // Initialize the session timer
+        extendSession();
     } else {
-        events.forEach(event => window.removeEventListener(event, reset));
+        // Cleanup when not authenticated
+        activityEvents.forEach(event => window.removeEventListener(event, activityHandler));
     }
 
     return () => {
-        events.forEach(event => window.removeEventListener(event, reset));
+        // Cleanup on component unmount
+        activityEvents.forEach(event => window.removeEventListener(event, activityHandler));
         if (sessionTimeoutId) clearTimeout(sessionTimeoutId);
         if (modalTimeoutId) clearTimeout(modalTimeoutId);
     };
-  }, [isAuthenticated, resetSession]);
+    // extendSession is the key dependency here
+  }, [isAuthenticated, extendSession]);
 
   useEffect(() => {
     const storedPhone = localStorage.getItem(AUTH_USER_PHONE_KEY) || sessionStorage.getItem(AUTH_USER_PHONE_KEY);
@@ -118,7 +129,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       {children}
       <SessionExpirationModal 
         isOpen={showExpirationModal}
-        onExtend={resetSession}
+        onExtend={extendSession}
         onLogout={logout}
       />
     </AuthContext.Provider>

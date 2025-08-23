@@ -35,7 +35,6 @@ export default function RootLayout({
           />
           <WelcomeModal />
           <main className="flex-grow">{children}</main>
-          <Footer />
           <Toaster />
         </TooltipProvider>
       </body>

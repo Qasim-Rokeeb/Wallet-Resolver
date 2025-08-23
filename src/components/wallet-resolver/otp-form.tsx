@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -38,6 +38,7 @@ function OtpFormSkeleton() {
 export function OtpForm({ phone, onSuccess }: OtpFormProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const form = useForm<OtpFormValues>({
     resolver: zodResolver(otpFormSchema),
@@ -45,6 +46,25 @@ export function OtpForm({ phone, onSuccess }: OtpFormProps) {
       otp: '',
     },
   });
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (resendCooldown > 0) {
+      timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
+
+  const handleResend = () => {
+    // TODO: Add actual resend logic here
+    console.log("Resending OTP to", phone);
+    toast({
+        title: 'OTP Resent!',
+        description: `A new code has been sent to ${phone}.`,
+        variant: 'success',
+    });
+    setResendCooldown(30); // 30 second cooldown
+  };
 
   const handleSubmit = (values: OtpFormValues) => {
     setLoading(true);
@@ -108,8 +128,16 @@ export function OtpForm({ phone, onSuccess }: OtpFormProps) {
         </Button>
 
         <div className="text-center">
-            <Button variant="link" type="button" size="sm">
-                Didn't receive a code? Resend
+            <Button
+              variant="link"
+              type="button"
+              size="sm"
+              onClick={handleResend}
+              disabled={resendCooldown > 0}
+            >
+              {resendCooldown > 0
+                ? `Didn't receive a code? Resend in ${resendCooldown}s`
+                : "Didn't receive a code? Resend"}
             </Button>
         </div>
       </form>

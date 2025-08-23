@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { DollarSign, List, CreditCard, Activity } from "lucide-react";
+import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 
@@ -68,41 +68,64 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Recent Transactions Card */}
-        <Card className="md:col-span-2 lg:col-span-3">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-                <List className="h-5 w-5" />
-                Recent Transactions
-            </CardTitle>
-            <CardDescription>
-              Here are the most recent transactions from your account.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50">
-                  <div>
-                      <p className="font-medium">Sent to +1 (555) 123-4567</p>
-                      <p className="text-sm text-muted-foreground">2 hours ago</p>
+        {/* Recent Transactions Container */}
+        <div className="md:col-span-2 lg:col-span-3">
+          <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <List className="h-5 w-5" />
+                    Recent Transactions
+                </CardTitle>
+                <CardDescription>
+                  Here are the most recent transactions from your account.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+                <Card className="p-4 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-destructive/10 rounded-full">
+                        <ArrowUpRight className="h-5 w-5 text-destructive" />
+                      </div>
+                      <div>
+                        <p className="font-medium">Sent to +1 (555) 123-4567</p>
+                        <p className="text-sm text-muted-foreground">2 hours ago</p>
+                      </div>
+                    </div>
+                    <p className="text-destructive font-semibold text-lg">- $50.00</p>
                   </div>
-                  <p className="text-destructive font-semibold">- $50.00</p>
-              </div>
-              <div className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50">
-                  <div>
-                      <p className="font-medium">Received from +1 (555) 987-6543</p>
-                      <p className="text-sm text-muted-foreground">1 day ago</p>
+                </Card>
+                <Card className="p-4 hover:bg-muted/50 transition-colors">
+                   <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-green-500/10 rounded-full">
+                          <ArrowDownLeft className="h-5 w-5 text-green-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium">Received from +1 (555) 987-6543</p>
+                          <p className="text-sm text-muted-foreground">1 day ago</p>
+                        </div>
+                      </div>
+                      <p className="text-green-600 font-semibold text-lg">+ $120.50</p>
                   </div>
-                  <p className="text-green-600 font-semibold">+ $120.50</p>
-              </div>
-              <div className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50">
-                  <div>
-                      <p className="font-medium">Sent to +1 (555) 555-5555</p>
-                      <p className="text-sm text-muted-foreground">3 days ago</p>
+                </Card>
+                <Card className="p-4 hover:bg-muted/50 transition-colors">
+                   <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-destructive/10 rounded-full">
+                          <ArrowUpRight className="h-5 w-5 text-destructive" />
+                        </div>
+                        <div>
+                          <p className="font-medium">Sent to +1 (555) 555-5555</p>
+                          <p className="text-sm text-muted-foreground">3 days ago</p>
+                        </div>
+                      </div>
+                      <p className="text-destructive font-semibold text-lg">- $25.00</p>
                   </div>
-                  <p className="text-destructive font-semibold">- $25.00</p>
-              </div>
-          </CardContent>
-        </Card>
+                </Card>
+            </CardContent>
+          </Card>
+        </div>
         
         {/* Chart Card */}
         <Card className="md:col-span-2 lg:col-span-3">

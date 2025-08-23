@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePhoneVerification } from "@/context/phone-verification-context";
 import { useAuth } from '@/context/auth-context';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Badge } from '@/components/ui/badge';
 
 export default function DashboardLayout({
   children,

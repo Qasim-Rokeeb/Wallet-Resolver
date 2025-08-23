@@ -4,7 +4,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePhoneVerification } from "@/context/phone-verification-context";
 import { useWallet } from "@/context/wallet-context";
-import { CheckCircle2, Circle, Send, UserCheck, Wallet } from "lucide-react";
+import { CheckCircle2, UserCheck, Wallet, Send } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useTransaction } from "@/context/transaction-context";
 import { useRouter } from "next/navigation";
@@ -71,9 +71,9 @@ export function OnboardingChecklist() {
                 <CardDescription>Complete these steps to get the most out of Wallet Resolver.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-                <div className="space-y-1">
+                <div className="space-y-2">
                     <div className="flex justify-between items-center mb-2">
-                        <p className="text-sm text-muted-foreground">{completedCount} of {checklistItems.length} completed</p>
+                        <p className="text-sm font-semibold">{completedCount} of {checklistItems.length} completed</p>
                     </div>
                     <Progress value={progress} className="h-2" />
                 </div>

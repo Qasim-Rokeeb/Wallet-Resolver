@@ -10,7 +10,9 @@ import { LedgerIcon } from '../icons/ledger';
 import { MetamaskIcon } from '../icons/metamask';
 import { WalletConnectIcon } from '../icons/walletconnect';
 import { useWallet } from '@/context/wallet-context';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShieldQuestion } from 'lucide-react';
+import { Separator } from '../ui/separator';
+import { WalletSecurityInfo } from './wallet-security-info';
 
 const walletProviders = [
     { name: 'MetaMask', icon: MetamaskIcon },
@@ -95,6 +97,24 @@ export function WalletConnectModal({ children, onConnect }: WalletConnectModalPr
                         )
                     })}
                 </div>
+                <Separator className="my-2" />
+                 <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="link" className="text-muted-foreground">
+                            <ShieldQuestion className="mr-2" />
+                            Learn about wallet security
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                         <DialogHeader>
+                            <DialogTitle className="text-center text-2xl">How We Keep You Safe</DialogTitle>
+                            <DialogDescription className="text-center pt-1">
+                                Connecting your wallet is secure. Here's what you need to know.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <WalletSecurityInfo />
+                    </DialogContent>
+                </Dialog>
             </DialogContent>
         </Dialog>
     );

@@ -1,9 +1,13 @@
+import { Hero } from "@/components/landing/hero";
 import { WalletResolverCard } from "@/components/wallet-resolver/wallet-resolver-card";
 
 export default function Home() {
   return (
-    <main className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-4 sm:p-8 md:p-24 bg-[#F5F5F5]">
-      <WalletResolverCard />
+    <main className="flex flex-col items-center bg-[#F5F5F5]">
+      <Hero />
+      <div className="w-full flex justify-center py-12 md:py-24 px-4">
+        <WalletResolverCard />
+      </div>
     </main>
   );
 }

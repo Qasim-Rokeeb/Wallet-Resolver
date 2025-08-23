@@ -8,7 +8,7 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Wallet } from 'lucide-react';
+import { UserPlus, Wallet, Copy } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PhoneInput } from '../ui/phone-input';
@@ -49,6 +49,17 @@ export function RegisterForm() {
       walletAddress: '',
     },
   });
+
+  const handleCopy = () => {
+    const walletAddress = form.getValues("walletAddress");
+    if (walletAddress) {
+      navigator.clipboard.writeText(walletAddress);
+      toast({
+        title: "Copied!",
+        description: "Wallet address copied to clipboard.",
+      });
+    }
+  };
 
   const handleSubmit = (values: RegisterFormValues) => {
     setLoading(true);
@@ -99,9 +110,22 @@ export function RegisterForm() {
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>Wallet Address</FormLabel>
-                    <FormControl>
-                    <Input placeholder="Connect wallet or paste address" {...field} />
-                    </FormControl>
+                    <div className="relative">
+                        <FormControl>
+                            <Input placeholder="Connect wallet or paste address" {...field} className="pr-10" />
+                        </FormControl>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute inset-y-0 right-0 h-full px-3"
+                            onClick={handleCopy}
+                            disabled={!field.value}
+                            aria-label="Copy wallet address"
+                        >
+                            <Copy className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                    </div>
                     <FormMessage />
                 </FormItem>
                 )}

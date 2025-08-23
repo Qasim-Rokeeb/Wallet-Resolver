@@ -111,7 +111,7 @@ export function LoginForm() {
                     <FormItem>
                         <FormLabel>Your Phone Number</FormLabel>
                         <FormControl>
-                        <PhoneInput {...field} />
+                        <PhoneInput placeholder="555 123 4567" {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

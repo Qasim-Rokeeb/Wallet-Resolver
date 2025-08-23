@@ -64,7 +64,7 @@ export function SendForm() {
     resolver: zodResolver(sendFormSchema),
     defaultValues: {
       phone: '',
-      amount: 0.1,
+      amount: undefined,
     },
   });
 
@@ -111,7 +111,7 @@ export function SendForm() {
                   </Tooltip>
               </div>
               <FormControl>
-                <PhoneInput {...field} />
+                <PhoneInput placeholder="555 123 4567" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

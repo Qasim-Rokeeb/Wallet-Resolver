@@ -173,7 +173,7 @@ export function RegisterForm() {
                 <FormItem>
                     <FormLabel>Your Phone Number</FormLabel>
                     <FormControl>
-                    <PhoneInput {...field} />
+                    <PhoneInput placeholder="555 123 4567" {...field} />
                     </FormControl>
                     <FormMessage />
                 </FormItem>
@@ -187,7 +187,7 @@ export function RegisterForm() {
                     <FormLabel>Wallet Address</FormLabel>
                     <div className="relative">
                         <FormControl>
-                            <Input placeholder="Link wallet or paste address" {...field} className="pr-10" />
+                            <Input placeholder="Link wallet or paste address e.g. 0x..." {...field} className="pr-10" />
                         </FormControl>
                         <Button
                             type="button"

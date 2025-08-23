@@ -130,7 +130,6 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
         <div className="relative flex-grow">
             <Input
                 type="tel"
-                placeholder="555 123 4567"
                 className="rounded-l-none pr-20"
                 value={displayPhoneNumber}
                 onChange={handlePhoneNumberChange}

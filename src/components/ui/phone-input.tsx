@@ -146,6 +146,7 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
               role="combobox"
               aria-expanded={open}
               className="justify-between w-28 rounded-r-none border-r-0"
+              aria-label="Select country code"
             >
               {selectedCountry.label.split(' ')[0]}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

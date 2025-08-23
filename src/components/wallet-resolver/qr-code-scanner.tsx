@@ -76,7 +76,7 @@ export function QrCodeScanner({ onScan }: QrCodeScannerProps) {
 
   return (
     <div>
-        <div id={scannerContainerId} className="w-full aspect-square rounded-md bg-muted" />
+        <div id={scannerContainerId} className="w-full aspect-square rounded-md bg-muted" aria-label="QR Code Scanner Viewport" />
         {hasPermission === false && (
              <Alert variant="destructive" className="mt-4">
               <AlertTitle>Camera Access Required</AlertTitle>

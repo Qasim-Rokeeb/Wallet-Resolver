@@ -8,11 +8,12 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Wallet, Copy } from 'lucide-react';
+import { UserPlus, Wallet, Copy, CheckCircle, PartyPopper } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PhoneInput } from '../ui/phone-input';
 import { OtpForm } from './otp-form';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 
 const registerFormSchema = z.object({
     phone: z.string().refine(value => {
@@ -44,11 +45,31 @@ function RegisterFormSkeleton() {
   )
 }
 
+function SuccessScreen({ onDone }: { onDone: () => void }) {
+    return (
+        <Card className="w-full border-none shadow-none">
+            <CardContent className="flex flex-col items-center justify-center text-center p-6 space-y-4">
+                 <div className="p-3 bg-green-500/10 rounded-full">
+                    <PartyPopper className="h-12 w-12 text-green-600" />
+                </div>
+                <CardTitle className="text-2xl">Registration Complete!</CardTitle>
+                <CardDescription className="text-muted-foreground">
+                    Your phone number has been successfully verified and linked to your wallet address.
+                </CardDescription>
+                <Button onClick={onDone} className="w-full" size="lg">
+                    Done
+                </Button>
+            </CardContent>
+        </Card>
+    )
+}
+
 
 export function RegisterForm() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [showOtpForm, setShowOtpForm] = useState(false);
+  const [showSuccessScreen, setShowSuccessScreen] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
 
   const form = useForm<RegisterFormValues>({
@@ -89,16 +110,20 @@ export function RegisterForm() {
 
   const handleOtpSuccess = () => {
     setShowOtpForm(false);
+    setShowSuccessScreen(true);
+  }
+
+  const handleDone = () => {
+    setShowSuccessScreen(false);
     form.reset();
-    toast({
-        title: 'Success!',
-        description: 'Your phone number has been registered.',
-        variant: 'success',
-    });
   }
 
   if (loading) {
     return <RegisterFormSkeleton />;
+  }
+
+  if (showSuccessScreen) {
+    return <SuccessScreen onDone={handleDone} />;
   }
 
   if (showOtpForm) {

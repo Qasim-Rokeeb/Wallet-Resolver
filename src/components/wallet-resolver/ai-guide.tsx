@@ -10,23 +10,17 @@ import { Separator } from '@/components/ui/separator';
 
 export function AIGuide() {
   const [guide, setGuide] = useState<string | null>(null);
-  const [loadingTask, setLoadingTask] = useState<string | null>(null);
 
-  const handleFetchGuide = async (task: 'add' | 'resolve') => {
-    setLoadingTask(task);
-    setGuide(null);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+  const showGuide = (task: 'add' | 'resolve') => {
     if (task === 'add') {
       setGuide('To register, connect your wallet, enter your phone number, and click "Register Phone".');
     } else {
       setGuide('To send a payment, enter the recipient\'s phone number, the amount, and click "Send Payment".');
     }
-    setLoadingTask(null);
   };
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={() => setGuide(null)}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="icon" aria-label="Help">
           <HelpCircle className="h-6 w-6 text-muted-foreground hover:text-primary transition-colors" />
@@ -42,27 +36,19 @@ export function AIGuide() {
         <div className="space-y-4">
           <div className="flex gap-4">
             <Button
-              onClick={() => handleFetchGuide('add')}
-              disabled={!!loadingTask}
+              onClick={() => showGuide('add')}
               className="w-full"
             >
-              {loadingTask === 'add' ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null}
               How to Register
             </Button>
             <Button
-              onClick={() => handleFetchGuide('resolve')}
-              disabled={!!loadingTask}
+              onClick={() => showGuide('resolve')}
               className="w-full"
             >
-              {loadingTask === 'resolve' ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null}
               How to Send
             </Button>
           </div>
-          {(loadingTask || guide) && <Separator />}
+          {guide && <Separator />}
           {guide && (
              <Alert>
               <AlertTitle>Quick Start Guide</AlertTitle>

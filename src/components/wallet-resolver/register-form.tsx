@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -15,6 +15,7 @@ import { PhoneInput } from '../ui/phone-input';
 import { OtpForm } from './otp-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { WalletConnectModal } from './wallet-connect-modal';
+import { useWallet } from '@/context/wallet-context';
 
 const registerFormSchema = z.object({
     phone: z.string().refine(value => {
@@ -72,16 +73,26 @@ export function RegisterForm() {
   const [showOtpForm, setShowOtpForm] = useState(false);
   const [showSuccessScreen, setShowSuccessScreen] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const { walletAddress, connectWallet } = useWallet();
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
       phone: '',
-      walletAddress: '',
+      walletAddress: walletAddress || '',
     },
   });
+
+  useEffect(() => {
+    if (walletAddress) {
+        form.setValue('walletAddress', walletAddress, { shouldValidate: true });
+    } else {
+        form.setValue('walletAddress', '', { shouldValidate: true });
+    }
+  }, [walletAddress, form])
   
   const handleWalletLinked = (address: string) => {
+    connectWallet(address);
     form.setValue('walletAddress', address, { shouldValidate: true });
   }
 
@@ -120,7 +131,7 @@ export function RegisterForm() {
 
   const handleDone = () => {
     setShowSuccessScreen(false);
-    form.reset();
+    form.reset({ phone: '', walletAddress: walletAddress || ''});
   }
 
   if (loading) {
@@ -138,12 +149,14 @@ export function RegisterForm() {
   return (
     <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <WalletConnectModal onConnect={handleWalletLinked}>
-                <Button variant="outline" className="w-full" type="button">
-                    <Wallet className="mr-2 h-4 w-4" />
-                    Link Wallet
-                </Button>
-            </WalletConnectModal>
+            {!walletAddress && (
+                <WalletConnectModal onConnect={handleWalletLinked}>
+                    <Button variant="outline" className="w-full" type="button">
+                        <Wallet className="mr-2 h-4 w-4" />
+                        Link Wallet
+                    </Button>
+                </WalletConnectModal>
+            )}
             
             <FormField
                 control={form.control}

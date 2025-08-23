@@ -9,6 +9,7 @@ import { CoinbaseIcon } from '../icons/coinbase';
 import { LedgerIcon } from '../icons/ledger';
 import { MetamaskIcon } from '../icons/metamask';
 import { WalletConnectIcon } from '../icons/walletconnect';
+import { useWallet } from '@/context/wallet-context';
 
 const walletProviders = [
     { name: 'MetaMask', icon: MetamaskIcon },
@@ -19,12 +20,13 @@ const walletProviders = [
 
 interface WalletConnectModalProps {
     children: React.ReactNode;
-    onConnect: (address: string) => void;
+    onConnect?: (address: string) => void;
 }
 
 export function WalletConnectModal({ children, onConnect }: WalletConnectModalProps) {
     const { toast } = useToast();
     const [isOpen, setIsOpen] = useState(false);
+    const { connectWallet } = useWallet();
 
     const handleWalletConnect = (walletName: string) => {
         console.log(`Connecting with ${walletName}...`);
@@ -36,7 +38,11 @@ export function WalletConnectModal({ children, onConnect }: WalletConnectModalPr
                 title: 'Wallet Connected!',
                 description: `Connected to ${walletName}.`,
             });
-            onConnect(mockAddress);
+            if (onConnect) {
+                onConnect(mockAddress);
+            } else {
+                connectWallet(mockAddress);
+            }
             setIsOpen(false);
         }, 1500);
     };

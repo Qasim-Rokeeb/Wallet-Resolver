@@ -2,22 +2,26 @@
 "use client";
 
 import { useState } from 'react';
-import { Wallet, Menu, X, ChevronRight, LayoutDashboard } from 'lucide-react';
+import { Wallet, Menu, X, ChevronRight, LayoutDashboard, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { WalletConnectModal } from '../wallet-resolver/wallet-connect-modal';
-import { useToast } from '@/hooks/use-toast';
+import { useWallet } from '@/context/wallet-context';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { toast } = useToast();
+  const { walletAddress, connectWallet, disconnectWallet } = useWallet();
 
   const handleConnect = (address: string) => {
-    // This is a dummy handler. In a real app, you'd update a global state.
-    console.log("Connected wallet in Navbar:", address);
-    toast({ title: "Wallet Linked", description: "Your wallet has been successfully linked." });
+    connectWallet(address);
   };
+  
+  const truncateAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  }
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -40,12 +44,31 @@ export function Navbar() {
             <Link href="/#register" className="text-gray-600 hover:text-primary transition-colors font-medium">
               Register
             </Link>
-            <WalletConnectModal onConnect={handleConnect}>
-                <Button>
-                  <Wallet className="mr-2 h-4 w-4" />
-                  Link Wallet
-                </Button>
-            </WalletConnectModal>
+            {walletAddress ? (
+               <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline">
+                      <Wallet className="mr-2 h-4 w-4" />
+                      {truncateAddress(walletAddress)}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>{truncateAddress(walletAddress)}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={disconnectWallet}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Disconnect</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+            ) : (
+                <WalletConnectModal onConnect={handleConnect}>
+                    <Button>
+                      <Wallet className="mr-2 h-4 w-4" />
+                      Link Wallet
+                    </Button>
+                </WalletConnectModal>
+            )}
           </div>
           <div className="md:hidden flex items-center">
             <Button
@@ -98,12 +121,19 @@ export function Navbar() {
           </Link>
         </div>
         <div className="p-4 border-t border-gray-200">
-           <WalletConnectModal onConnect={handleConnect}>
-              <Button className="w-full" onClick={() => setIsMenuOpen(false)}>
-                <Wallet className="mr-2 h-4 w-4" />
-                Link Wallet
-              </Button>
-            </WalletConnectModal>
+           {walletAddress ? (
+               <Button variant="outline" className="w-full" onClick={disconnectWallet}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Disconnect ({truncateAddress(walletAddress)})
+                </Button>
+           ) : (
+             <WalletConnectModal onConnect={handleConnect}>
+                <Button className="w-full" onClick={() => setIsMenuOpen(false)}>
+                  <Wallet className="mr-2 h-4 w-4" />
+                  Link Wallet
+                </Button>
+              </WalletConnectModal>
+           )}
         </div>
       </div>
     </header>

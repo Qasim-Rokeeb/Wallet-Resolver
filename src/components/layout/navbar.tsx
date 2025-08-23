@@ -6,9 +6,18 @@ import { Wallet, Menu, X, ChevronRight, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { WalletConnectModal } from '../wallet-resolver/wallet-connect-modal';
+import { useToast } from '@/hooks/use-toast';
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { toast } = useToast();
+
+  const handleConnect = (address: string) => {
+    // This is a dummy handler. In a real app, you'd update a global state.
+    console.log("Connected wallet in Navbar:", address);
+    toast({ title: "Wallet Linked", description: "Your wallet has been successfully linked." });
+  };
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -31,10 +40,12 @@ export function Navbar() {
             <Link href="/#register" className="text-gray-600 hover:text-primary transition-colors font-medium">
               Register
             </Link>
-            <Button>
-              <Wallet className="mr-2 h-4 w-4" />
-              Link Wallet
-            </Button>
+            <WalletConnectModal onConnect={handleConnect}>
+                <Button>
+                  <Wallet className="mr-2 h-4 w-4" />
+                  Link Wallet
+                </Button>
+            </WalletConnectModal>
           </div>
           <div className="md:hidden flex items-center">
             <Button
@@ -87,10 +98,12 @@ export function Navbar() {
           </Link>
         </div>
         <div className="p-4 border-t border-gray-200">
-           <Button className="w-full" onClick={() => setIsMenuOpen(false)}>
-              <Wallet className="mr-2 h-4 w-4" />
-              Link Wallet
-            </Button>
+           <WalletConnectModal onConnect={handleConnect}>
+              <Button className="w-full" onClick={() => setIsMenuOpen(false)}>
+                <Wallet className="mr-2 h-4 w-4" />
+                Link Wallet
+              </Button>
+            </WalletConnectModal>
         </div>
       </div>
     </header>

@@ -14,6 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { PhoneInput } from '../ui/phone-input';
 import { OtpForm } from './otp-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { WalletConnectModal } from './wallet-connect-modal';
 
 const registerFormSchema = z.object({
     phone: z.string().refine(value => {
@@ -79,6 +80,10 @@ export function RegisterForm() {
       walletAddress: '',
     },
   });
+  
+  const handleWalletLinked = (address: string) => {
+    form.setValue('walletAddress', address, { shouldValidate: true });
+  }
 
   const handleCopy = () => {
     const walletAddress = form.getValues("walletAddress");
@@ -133,12 +138,12 @@ export function RegisterForm() {
   return (
     <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <div className="flex justify-center">
+            <WalletConnectModal onConnect={handleWalletLinked}>
                 <Button variant="outline" className="w-full" type="button">
-                <Wallet className="mr-2 h-4 w-4" />
-                Link Wallet
+                    <Wallet className="mr-2 h-4 w-4" />
+                    Link Wallet
                 </Button>
-            </div>
+            </WalletConnectModal>
             
             <FormField
                 control={form.control}
@@ -161,7 +166,7 @@ export function RegisterForm() {
                     <FormLabel>Wallet Address</FormLabel>
                     <div className="relative">
                         <FormControl>
-                            <Input placeholder="Connect wallet or paste address" {...field} className="pr-10" />
+                            <Input placeholder="Link wallet or paste address" {...field} className="pr-10" />
                         </FormControl>
                         <Button
                             type="button"

@@ -33,18 +33,27 @@ export function WalletConnectModal({ children, onConnect }: WalletConnectModalPr
     const handleWalletConnect = (walletName: string) => {
         setLoadingWallet(walletName);
         console.log(`Connecting with ${walletName}...`);
-        // Mock connection logic
+        // Mock connection logic with random failure
         setTimeout(() => {
-            const mockAddress = "0x" + Array(40).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-            
-            if (onConnect) {
-                onConnect(mockAddress);
+            if (Math.random() > 0.3) { // 70% success rate
+                const mockAddress = "0x" + Array(40).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+                
+                if (onConnect) {
+                    onConnect(mockAddress);
+                } else {
+                    connectWallet(mockAddress);
+                }
+                
+                setLoadingWallet(null);
+                setIsOpen(false);
             } else {
-                connectWallet(mockAddress);
+                toast({
+                    variant: 'destructive',
+                    title: 'Connection Failed',
+                    description: `Could not connect to ${walletName}. Please try again.`
+                });
+                setLoadingWallet(null);
             }
-            
-            setLoadingWallet(null);
-            setIsOpen(false);
         }, 1500);
     };
 

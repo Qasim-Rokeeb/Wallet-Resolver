@@ -3,10 +3,13 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft, Send } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { SheetFormWrapper } from "@/components/wallet-resolver/sheet-form-wrapper";
+import { SendForm } from "@/components/wallet-resolver/send-form";
 
 const chartData = [
   { month: "January", desktop: 186 },
@@ -234,6 +237,21 @@ export default function DashboardPage() {
             </CardContent>
         </Card>
       </div>
+      <SheetFormWrapper
+        title="Send a Quick Payment"
+        description="Enter the recipient's details to send a payment instantly."
+        trigger={
+            <Button
+                size="lg"
+                className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl"
+                aria-label="Send Payment"
+            >
+                <Send className="h-6 w-6" />
+            </Button>
+        }
+    >
+        <SendForm />
+    </SheetFormWrapper>
     </div>
   );
 }

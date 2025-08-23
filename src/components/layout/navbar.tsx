@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Wallet, Menu, X, ChevronRight } from 'lucide-react';
+import { Wallet, Menu, X, ChevronRight, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -21,6 +21,10 @@ export function Navbar() {
             </Link>
           </div>
           <div className="hidden md:flex items-center space-x-4">
+            <Link href="/dashboard" className="text-gray-600 hover:text-primary transition-colors font-medium flex items-center gap-2">
+              <LayoutDashboard className="h-5 w-5" />
+              Dashboard
+            </Link>
             <Link href="/#send" className="text-gray-600 hover:text-primary transition-colors font-medium">
               Send
             </Link>
@@ -54,6 +58,17 @@ export function Navbar() {
         )}
       >
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <Link
+            href="/dashboard"
+            onClick={() => setIsMenuOpen(false)}
+            className="flex items-center justify-between text-gray-600 hover:bg-gray-100 hover:text-primary block px-3 py-2 rounded-md text-base font-medium"
+          >
+            <div className="flex items-center gap-2">
+              <LayoutDashboard className="h-5 w-5" />
+              <span>Dashboard</span>
+            </div>
+            <ChevronRight className="h-5 w-5" />
+          </Link>
           <Link
             href="/#send"
             onClick={() => setIsMenuOpen(false)}

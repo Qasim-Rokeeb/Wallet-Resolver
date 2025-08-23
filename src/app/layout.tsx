@@ -11,6 +11,7 @@ import { WelcomeModal } from '@/components/onboarding/welcome-modal';
 import { WalletProvider } from '@/context/wallet-context';
 import { PhoneVerificationProvider } from '@/context/phone-verification-context';
 import { AuthProvider } from '@/context/auth-context';
+import { TransactionProvider } from '@/context/transaction-context';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
@@ -33,17 +34,19 @@ export default function RootLayout({
         <AuthProvider>
           <PhoneVerificationProvider>
             <WalletProvider>
-              <TooltipProvider>
-                <Navbar />
-                <AlertBanner 
-                  title="Beta Notice:"
-                  description="This is a demo application. Do not use real wallet information."
-                  initiallyVisible={true}
-                />
-                <WelcomeModal />
-                <main className="flex-grow">{children}</main>
-                <Toaster />
-              </TooltipProvider>
+              <TransactionProvider>
+                <TooltipProvider>
+                  <Navbar />
+                  <AlertBanner 
+                    title="Beta Notice:"
+                    description="This is a demo application. Do not use real wallet information."
+                    initiallyVisible={true}
+                  />
+                  <WelcomeModal />
+                  <main className="flex-grow">{children}</main>
+                  <Toaster />
+                </TooltipProvider>
+              </TransactionProvider>
             </WalletProvider>
           </PhoneVerificationProvider>
         </AuthProvider>

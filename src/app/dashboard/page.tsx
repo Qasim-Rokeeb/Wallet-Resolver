@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { SheetFormWrapper } from "@/components/wallet-resolver/sheet-form-wrapper";
 import { SendForm } from "@/components/wallet-resolver/send-form";
+import { OnboardingChecklist } from "@/components/onboarding/onboarding-checklist";
 
 const chartData = [
   { month: "January", desktop: 186 },
@@ -103,7 +104,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
+      <OnboardingChecklist />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Balance Card */}
         <Card>

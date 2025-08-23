@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { useToast } from '@/hooks/use-toast';
 import { useWallet } from './wallet-context';
 import { usePhoneVerification } from './phone-verification-context';
+import { useTransaction } from './transaction-context';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -27,6 +28,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // We need to clear other contexts on logout
   const walletContext = useWallet();
   const phoneVerificationContext = usePhoneVerification();
+  const transactionContext = useTransaction();
 
   useEffect(() => {
     const storedPhone = localStorage.getItem(AUTH_USER_PHONE_KEY);
@@ -51,6 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Clear related contexts
     walletContext?.disconnectWallet(false); // Pass false to prevent toast
     phoneVerificationContext?.unverifyPhone();
+    transactionContext?.resetTransactions();
 
     toast({
         title: 'Logged Out',

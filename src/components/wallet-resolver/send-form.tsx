@@ -23,6 +23,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { PhoneInput } from '../ui/phone-input';
+import { useTransaction } from '@/context/transaction-context';
 
 const sendFormSchema = z.object({
   phone: z.string().refine(value => {
@@ -57,6 +58,7 @@ export function SendForm() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const { recordTransaction } = useTransaction();
 
   const form = useForm<SendFormValues>({
     resolver: zodResolver(sendFormSchema),
@@ -78,6 +80,7 @@ export function SendForm() {
             description: `Successfully sent ${values.amount} ETH to ${values.phone}.`,
             variant: 'success',
         });
+        recordTransaction();
         setLoading(false);
         form.reset();
     }, 2000);

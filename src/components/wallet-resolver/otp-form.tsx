@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, AlertTriangle } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Skeleton } from '../ui/skeleton';
@@ -38,7 +38,8 @@ function OtpFormSkeleton() {
 export function OtpForm({ phone, onSuccess }: OtpFormProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendCooldown, setResendCooldown] = useState(30);
+  const [expirationTime, setExpirationTime] = useState(300); // 5 minutes
 
   const form = useForm<OtpFormValues>({
     resolver: zodResolver(otpFormSchema),
@@ -48,12 +49,26 @@ export function OtpForm({ phone, onSuccess }: OtpFormProps) {
   });
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    let cooldownTimer: NodeJS.Timeout;
     if (resendCooldown > 0) {
-      timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      cooldownTimer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
     }
-    return () => clearTimeout(timer);
+    return () => clearTimeout(cooldownTimer);
   }, [resendCooldown]);
+
+  useEffect(() => {
+    let expirationTimer: NodeJS.Timeout;
+    if (expirationTime > 0) {
+      expirationTimer = setTimeout(() => setExpirationTime(expirationTime - 1), 1000);
+    } else {
+        toast({
+            variant: 'destructive',
+            title: 'OTP Expired',
+            description: 'Your verification code has expired. Please request a new one.'
+        })
+    }
+    return () => clearTimeout(expirationTimer);
+  }, [expirationTime, toast]);
 
   const handleResend = () => {
     // TODO: Add actual resend logic here
@@ -63,7 +78,8 @@ export function OtpForm({ phone, onSuccess }: OtpFormProps) {
         description: `A new code has been sent to ${phone}.`,
         variant: 'success',
     });
-    setResendCooldown(30); // 30 second cooldown
+    setResendCooldown(30);
+    setExpirationTime(300);
   };
 
   const handleSubmit = (values: OtpFormValues) => {
@@ -89,6 +105,10 @@ export function OtpForm({ phone, onSuccess }: OtpFormProps) {
     return <OtpFormSkeleton />;
   }
 
+  const isExpired = expirationTime === 0;
+  const minutes = Math.floor(expirationTime / 60);
+  const seconds = expirationTime % 60;
+
 
   return (
     <Form {...form}>
@@ -106,7 +126,7 @@ export function OtpForm({ phone, onSuccess }: OtpFormProps) {
             <FormItem className="flex flex-col items-center">
               <FormLabel className="sr-only">One-Time Password</FormLabel>
               <FormControl>
-                <InputOTP maxLength={6} {...field}>
+                <InputOTP maxLength={6} {...field} disabled={isExpired}>
                     <InputOTPGroup>
                         <InputOTPSlot index={0} />
                         <InputOTPSlot index={1} />
@@ -121,8 +141,18 @@ export function OtpForm({ phone, onSuccess }: OtpFormProps) {
             </FormItem>
           )}
         />
+         <div className="text-center text-sm text-muted-foreground">
+          {isExpired ? (
+            <span className="text-destructive flex items-center justify-center gap-1">
+                <AlertTriangle className="h-4 w-4" />
+                Code has expired. Please request a new one.
+            </span>
+          ) : (
+            `Code expires in ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+          )}
+        </div>
         
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full" disabled={isExpired}>
           <CheckCircle className="mr-2 h-4 w-4" />
           Verify
         </Button>
@@ -144,4 +174,3 @@ export function OtpForm({ phone, onSuccess }: OtpFormProps) {
     </Form>
   );
 }
-

@@ -85,12 +85,22 @@ export default {
             "transform": "translateX(100%)",
           },
         },
+        "checkmark-circle": {
+            "0%": { "stroke-dashoffset": "157" },
+            "100%": { "stroke-dashoffset": "0" },
+        },
+        "checkmark-check": {
+            "0%": { "stroke-dashoffset": "48" },
+            "100%": { "stroke-dashoffset": "96" },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         "caret-blink": "caret-blink 1.25s ease-out infinite",
         "shimmer": "shimmer 2s infinite",
+        'checkmark-circle': 'checkmark-circle 0.6s ease-in-out forwards',
+        'checkmark-check': 'checkmark-check 0.4s ease-in-out 0.4s forwards',
       },
     },
   },

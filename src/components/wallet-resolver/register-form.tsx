@@ -8,7 +8,7 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Wallet, Copy, CheckCircle, PartyPopper } from 'lucide-react';
+import { UserPlus, Wallet, Copy } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PhoneInput } from '../ui/phone-input';
@@ -52,10 +52,36 @@ function SuccessScreen({ onDone }: { onDone: () => void }) {
     return (
         <Card className="w-full border-none shadow-none">
             <CardContent className="flex flex-col items-center justify-center text-center p-6 space-y-4">
-                 <div className="p-3 bg-green-500/10 rounded-full">
-                    <PartyPopper className="h-12 w-12 text-green-600" />
+                 <div className="h-24 w-24">
+                    <svg
+                        className="w-full h-full"
+                        viewBox="0 0 52 52"
+                    >
+                        <circle
+                            className="text-green-500/20 stroke-current"
+                            cx="26"
+                            cy="26"
+                            r="25"
+                            fill="none"
+                        />
+                        <circle
+                            className="text-green-600 stroke-current animate-checkmark-circle"
+                            strokeLinecap="round"
+                            cx="26"
+                            cy="26"
+                            r="25"
+                            fill="none"
+                        />
+                        <path
+                            className="text-green-600 stroke-current animate-checkmark-check"
+                            fill="none"
+                            strokeLinecap="round"
+                            strokeMiterlimit="10"
+                            d="M14 27l5.917 5.917L38 20"
+                        />
+                    </svg>
                 </div>
-                <CardTitle className="text-2xl">Registration Complete!</CardTitle>
+                <CardTitle className="text-2xl pt-2">Registration Complete!</CardTitle>
                 <CardDescription className="text-muted-foreground">
                     Your phone number has been successfully verified and linked to your wallet address.
                 </CardDescription>

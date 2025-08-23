@@ -33,7 +33,7 @@ export function Navbar() {
             </Link>
             <Button>
               <Wallet className="mr-2 h-4 w-4" />
-              Connect Wallet
+              Link Wallet
             </Button>
           </div>
           <div className="md:hidden flex items-center">
@@ -89,7 +89,7 @@ export function Navbar() {
         <div className="p-4 border-t border-gray-200">
            <Button className="w-full" onClick={() => setIsMenuOpen(false)}>
               <Wallet className="mr-2 h-4 w-4" />
-              Connect Wallet
+              Link Wallet
             </Button>
         </div>
       </div>

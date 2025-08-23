@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react"
-import { Check, ChevronsUpDown, QrCode } from "lucide-react"
+import { Check, ChevronsUpDown, QrCode, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -83,6 +83,10 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
 
     const displayPhoneNumber = value?.replace(selectedCountry.code, '').trim() || '';
 
+    const handleClear = () => {
+        onChange?.(`${selectedCountry.code} `);
+    }
+
     return (
       <div className={cn("flex items-center", className)}>
         <Popover open={open} onOpenChange={setOpen}>
@@ -127,31 +131,45 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
             <Input
                 type="tel"
                 placeholder="555 123 4567"
-                className="rounded-l-none pr-10"
+                className="rounded-l-none pr-20"
                 value={displayPhoneNumber}
                 onChange={handlePhoneNumberChange}
                 ref={ref}
                 {...props}
             />
-            <Dialog open={scannerOpen} onOpenChange={setScannerOpen}>
-                <DialogTrigger asChild>
+            <div className="absolute inset-y-0 right-0 flex items-center">
+                {displayPhoneNumber && (
                     <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="absolute inset-y-0 right-0 h-full px-3"
-                        aria-label="Scan QR code"
+                        className="h-full px-3 rounded-none"
+                        onClick={handleClear}
+                        aria-label="Clear phone number"
                     >
-                        <QrCode className="h-4 w-4 text-muted-foreground" />
+                        <X className="h-4 w-4 text-muted-foreground" />
                     </Button>
-                </DialogTrigger>
-                <DialogContent>
-                     <DialogHeader>
-                        <DialogTitle>Scan QR Code</DialogTitle>
-                    </DialogHeader>
-                    <QrCodeScanner onScan={handleQrScan} />
-                </DialogContent>
-            </Dialog>
+                )}
+                <Dialog open={scannerOpen} onOpenChange={setScannerOpen}>
+                    <DialogTrigger asChild>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-full px-3 rounded-l-none"
+                            aria-label="Scan QR code"
+                        >
+                            <QrCode className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                         <DialogHeader>
+                            <DialogTitle>Scan QR Code</DialogTitle>
+                        </DialogHeader>
+                        <QrCodeScanner onScan={handleQrScan} />
+                    </DialogContent>
+                </Dialog>
+            </div>
         </div>
       </div>
     )

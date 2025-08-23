@@ -36,16 +36,13 @@ export function WalletConnectModal({ children, onConnect }: WalletConnectModalPr
         // Mock connection logic
         setTimeout(() => {
             const mockAddress = "0x" + Array(40).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-            toast({
-                variant: 'success',
-                title: 'Wallet Connected!',
-                description: `Connected to ${walletName}.`,
-            });
+            
             if (onConnect) {
                 onConnect(mockAddress);
             } else {
                 connectWallet(mockAddress);
             }
+            
             setLoadingWallet(null);
             setIsOpen(false);
         }, 1500);

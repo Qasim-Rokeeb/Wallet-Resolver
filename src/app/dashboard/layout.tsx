@@ -3,7 +3,7 @@
 
 import { Footer } from "@/components/layout/footer";
 import { Sidebar, SidebarProvider, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { LayoutDashboard, Send, UserPlus, Home, Wallet, User, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Send, UserPlus, Home, Wallet, User, Settings, LogOut, CheckCircle, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { Breadcrumbs } from "@/components/ui/breadcrumb";
@@ -11,6 +11,8 @@ import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { usePhoneVerification } from "@/context/phone-verification-context";
+import { Badge } from "@/components/ui/badge";
 
 export default function DashboardLayout({
   children,
@@ -20,6 +22,7 @@ export default function DashboardLayout({
     const pathname = usePathname();
     const isActive = (path: string) => pathname === path;
     const breadcrumbs = useBreadcrumbs();
+    const { isPhoneVerified } = usePhoneVerification();
 
   return (
     <SidebarProvider>
@@ -88,11 +91,24 @@ export default function DashboardLayout({
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56" align="end" forceMount>
                                 <DropdownMenuLabel className="font-normal">
-                                    <div className="flex flex-col space-y-1">
+                                    <div className="flex flex-col space-y-2">
                                         <p className="text-sm font-medium leading-none">User</p>
-                                        <p className="text-xs leading-none text-muted-foreground">
-                                            user@example.com
-                                        </p>
+                                        <div className='flex items-center justify-between'>
+                                          <p className="text-xs leading-none text-muted-foreground">
+                                              user@example.com
+                                          </p>
+                                          {isPhoneVerified ? (
+                                              <Badge variant="secondary" className="border-green-500 text-green-700">
+                                                  <CheckCircle className="mr-1 h-3 w-3" />
+                                                  Verified
+                                              </Badge>
+                                          ) : (
+                                              <Badge variant="secondary" className="border-amber-500 text-amber-700">
+                                                  <AlertTriangle className="mr-1 h-3 w-3" />
+                                                  Not Verified
+                                              </Badge>
+                                          )}
+                                        </div>
                                     </div>
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />

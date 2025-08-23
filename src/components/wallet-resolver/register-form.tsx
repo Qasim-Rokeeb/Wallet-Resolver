@@ -16,6 +16,7 @@ import { OtpForm } from './otp-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { WalletConnectModal } from './wallet-connect-modal';
 import { useWallet } from '@/context/wallet-context';
+import { usePhoneVerification } from '@/context/phone-verification-context';
 
 const registerFormSchema = z.object({
     phone: z.string().refine(value => {
@@ -74,6 +75,7 @@ export function RegisterForm() {
   const [showSuccessScreen, setShowSuccessScreen] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const { walletAddress, connectWallet } = useWallet();
+  const { verifyPhone } = usePhoneVerification();
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
@@ -125,6 +127,7 @@ export function RegisterForm() {
   };
 
   const handleOtpSuccess = () => {
+    verifyPhone();
     setShowOtpForm(false);
     setShowSuccessScreen(true);
   }

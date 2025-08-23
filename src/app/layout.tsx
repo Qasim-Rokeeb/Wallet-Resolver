@@ -9,6 +9,7 @@ import { Footer } from '@/components/layout/footer';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { WelcomeModal } from '@/components/onboarding/welcome-modal';
 import { WalletProvider } from '@/context/wallet-context';
+import { PhoneVerificationProvider } from '@/context/phone-verification-context';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
@@ -28,19 +29,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} flex flex-col min-h-screen`}>
-        <WalletProvider>
-          <TooltipProvider>
-            <Navbar />
-            <AlertBanner 
-              title="Beta Notice:"
-              description="This is a demo application. Do not use real wallet information."
-              initiallyVisible={true}
-            />
-            <WelcomeModal />
-            <main className="flex-grow">{children}</main>
-            <Toaster />
-          </TooltipProvider>
-        </WalletProvider>
+        <PhoneVerificationProvider>
+          <WalletProvider>
+            <TooltipProvider>
+              <Navbar />
+              <AlertBanner 
+                title="Beta Notice:"
+                description="This is a demo application. Do not use real wallet information."
+                initiallyVisible={true}
+              />
+              <WelcomeModal />
+              <main className="flex-grow">{children}</main>
+              <Toaster />
+            </TooltipProvider>
+          </WalletProvider>
+        </PhoneVerificationProvider>
       </body>
     </html>
   );

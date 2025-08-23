@@ -1,7 +1,12 @@
+
+"use client";
+
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { Skeleton } from "@/components/ui/skeleton";
 
 const chartData = [
   { month: "January", desktop: 186 },
@@ -19,7 +24,82 @@ const chartConfig = {
   },
 };
 
+function DashboardSkeleton() {
+    return (
+        <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <Skeleton className="h-10 w-1/3 mb-8" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Card>
+                    <CardHeader>
+                        <Skeleton className="h-5 w-2/3" />
+                    </CardHeader>
+                    <CardContent>
+                        <Skeleton className="h-8 w-1/2 mb-2" />
+                        <Skeleton className="h-4 w-1/3" />
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <Skeleton className="h-5 w-2/3" />
+                    </CardHeader>
+                    <CardContent>
+                        <Skeleton className="h-8 w-1/2 mb-2" />
+                        <Skeleton className="h-4 w-1/3" />
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <Skeleton className="h-5 w-2/3" />
+                    </CardHeader>
+                    <CardContent>
+                        <Skeleton className="h-8 w-1/2 mb-2" />
+                        <Skeleton className="h-4 w-1/3" />
+                    </CardContent>
+                </Card>
+                <div className="md:col-span-2 lg:col-span-3">
+                    <Card>
+                        <CardHeader>
+                            <Skeleton className="h-6 w-1/4 mb-2" />
+                            <Skeleton className="h-4 w-1/2" />
+                        </CardHeader>
+                        <CardContent className="grid gap-4">
+                            <Skeleton className="h-16 w-full" />
+                            <Skeleton className="h-16 w-full" />
+                            <Skeleton className="h-16 w-full" />
+                        </CardContent>
+                    </Card>
+                </div>
+                <div className="md:col-span-2 lg:col-span-3">
+                    <Card>
+                        <CardHeader>
+                            <Skeleton className="h-6 w-1/4 mb-2" />
+                            <Skeleton className="h-4 w-1/3" />
+                        </CardHeader>
+                        <CardContent>
+                           <Skeleton className="w-full h-[250px] sm:h-[350px]" />
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 export default function DashboardPage() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000); 
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <DashboardSkeleton />;
+  }
+
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold text-primary mb-8">Dashboard</h1>

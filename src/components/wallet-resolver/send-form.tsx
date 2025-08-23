@@ -2,12 +2,23 @@
 "use client";
 
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Send } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+
+const sendFormSchema = z.object({
+  phone: z.string().min(10, { message: "Phone number must be at least 10 digits." }),
+  amount: z.coerce.number().positive({ message: "Amount must be positive." }),
+});
+
+type SendFormValues = z.infer<typeof sendFormSchema>;
+
 
 function SendFormSkeleton() {
     return (
@@ -28,33 +39,27 @@ function SendFormSkeleton() {
 export function SendForm() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const form = useForm<SendFormValues>({
+    resolver: zodResolver(sendFormSchema),
+    defaultValues: {
+      phone: '',
+      amount: 0.1,
+    },
+  });
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const phone = formData.get('phone');
-    const amount = formData.get('amount');
-
-    if (!phone || !amount) {
-      toast({
-        title: 'Error',
-        description: 'Please fill in all fields.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
+  const handleSubmit = (values: SendFormValues) => {
     setLoading(true);
     setTimeout(() => {
         // TODO: Add actual send logic
-        console.log({ phone, amount });
+        console.log(values);
 
         toast({
-        title: 'Payment Sent!',
-        description: `Successfully sent ${amount} ETH to ${phone}.`,
-        variant: 'success',
+            title: 'Payment Sent!',
+            description: `Successfully sent ${values.amount} ETH to ${values.phone}.`,
+            variant: 'success',
         });
         setLoading(false);
+        form.reset();
     }, 2000);
   };
 
@@ -64,19 +69,39 @@ export function SendForm() {
 
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit}>
-      <div className="space-y-2">
-        <Label htmlFor="send-phone">Recipient's Phone Number</Label>
-        <Input id="send-phone" name="phone" type="tel" placeholder="+1 (555) 123-4567" />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="amount">Amount (ETH)</Label>
-        <Input id="amount" name="amount" type="number" step="0.01" placeholder="0.1" />
-      </div>
-      <Button type="submit" className="w-full">
-        <Send className="mr-2 h-4 w-4" />
-        Send Payment
-      </Button>
-    </form>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Recipient's Phone Number</FormLabel>
+              <FormControl>
+                <Input type="tel" placeholder="+1 (555) 123-4567" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="amount"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Amount (ETH)</FormLabel>
+              <FormControl>
+                <Input type="number" step="0.01" placeholder="0.1" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full">
+          <Send className="mr-2 h-4 w-4" />
+          Send Payment
+        </Button>
+      </form>
+    </Form>
   );
 }

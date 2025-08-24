@@ -58,3 +58,32 @@
     background: linear-gradient(to bottom right, hsl(var(--background)), hsl(var(--secondary)));
   }
 }
+
+@media print {
+  body {
+    background: none;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .printable-area {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+  }
+  .printable-area .data-table-toolbar {
+    display: none;
+  }
+  .printable-area .data-table {
+    border: none;
+  }
+  .printable-area .table {
+    font-size: 10px;
+  }
+  .printable-area .table th, .printable-area .table td {
+    padding: 4px;
+  }
+}

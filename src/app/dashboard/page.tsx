@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft, Send, ListX, Clock, MoreHorizontal } from "lucide-react";
+import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft, Send, ListX, Clock, MoreHorizontal, Printer } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Area, AreaChart } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton";
@@ -160,7 +160,7 @@ const columns: ColumnDef<Transaction>[] = [
       const isSent = type === 'sent';
       return (
         <div className="flex items-center gap-2">
-            <div className={`p-2 rounded-full ${isSent ? 'bg-destructive/10' : 'bg-green-500/10'}`}>
+            <div className={`p-2 rounded-full no-print ${isSent ? 'bg-destructive/10' : 'bg-green-500/10'}`}>
                 {isSent ? <ArrowUpRight className="h-4 w-4 text-destructive" /> : <ArrowDownLeft className="h-4 w-4 text-green-600" />}
             </div>
             <span className="capitalize font-medium">{type}</span>
@@ -238,7 +238,7 @@ function PendingTransactions({ transactions }: { transactions: Transaction[] }) 
         return null;
     }
     return (
-        <Card>
+        <Card className="no-print">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Clock className="h-5 w-5" />
@@ -289,11 +289,17 @@ export default function DashboardPage() {
   const todaySent = todayTransactions.filter(t => t.type === 'sent').reduce((acc, t) => acc + t.amount, 0);
   const todayReceived = todayTransactions.filter(t => t.type === 'received').reduce((acc, t) => acc + t.amount, 0);
 
+  const handlePrint = () => {
+    window.print();
+  }
+
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
-      <OnboardingChecklist />
+      <div className="no-print">
+        <OnboardingChecklist />
+      </div>
       <PendingTransactions transactions={pendingTransactions} />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 no-print">
         {/* Balance Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -396,92 +402,99 @@ export default function DashboardPage() {
             </p>
           </CardContent>
         </Card>
+      </div>
 
-        {/* Recent Transactions Container */}
-        <div className="md:col-span-2 lg:col-span-3">
-          <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <List className="h-5 w-5" />
-                    Transaction History
-                </CardTitle>
-                <CardDescription>
-                  Here are the most recent transactions from your account.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <DataTable 
-                    columns={columns} 
-                    data={completedTransactions} 
-                    toolbar={(table) => (
-                         <div className="flex items-center gap-2">
-                            {table.getColumn("type") && (
-                                <DataTableFacetedFilter
-                                    column={table.getColumn("type")}
-                                    title="Type"
-                                    options={transactionTypes}
-                                />
-                            )}
+      {/* Recent Transactions Container */}
+      <div className="md:col-span-2 lg:col-span-3 printable-area">
+        <Card>
+          <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                  <List className="h-5 w-5" />
+                  Transaction History
+              </CardTitle>
+              <CardDescription>
+                Here are the most recent transactions from your account.
+              </CardDescription>
+          </CardHeader>
+          <CardContent>
+              <DataTable 
+                  columns={columns} 
+                  data={completedTransactions} 
+                  toolbar={(table) => (
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                {table.getColumn("type") && (
+                                    <DataTableFacetedFilter
+                                        column={table.getColumn("type")}
+                                        title="Type"
+                                        options={transactionTypes}
+                                    />
+                                )}
+                            </div>
+                            <Button variant="outline" size="sm" onClick={handlePrint} className="ml-auto">
+                                <Printer className="mr-2 h-4 w-4" />
+                                Print
+                            </Button>
                         </div>
-                    )}
-                    emptyState={<EmptyState />}
-                />
-            </CardContent>
-          </Card>
-        </div>
-        
-        {/* Chart Card */}
-        <Card className="md:col-span-2 lg:col-span-3">
-            <CardHeader>
-                <CardTitle>Activity Overview</CardTitle>
-                <CardDescription>January - June 2024</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <ChartContainer config={chartConfig} className="w-full h-[250px] sm:h-[350px]">
-                    <BarChart accessibilityLayer data={chartData}>
-                        <CartesianGrid vertical={false} />
-                        <XAxis
-                          dataKey="month"
-                          tickLine={false}
-                          tickMargin={10}
-                          axisLine={false}
-                          tickFormatter={(value) => value.slice(0, 3)}
-                        />
-                        <YAxis tickLine={false} axisLine={false} />
-                        <ChartTooltip
-                          cursor={false}
-                          content={<ChartTooltipContent indicator="dot" />}
-                        />
-                        <ChartLegend content={<ChartLegendContent />} />
-                        <Bar dataKey="sent" fill="var(--color-sent)" radius={4} />
-                        <Bar dataKey="received" fill="var(--color-received)" radius={4} />
-                    </BarChart>
-                </ChartContainer>
-            </CardContent>
+                  )}
+                  emptyState={<EmptyState />}
+              />
+          </CardContent>
         </Card>
       </div>
-      <Sheet>
-        <SheetTrigger asChild>
-            <Button
-                size="lg"
-                className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl"
-                aria-label="Send Payment"
-            >
-                <Send className="h-6 w-6" />
-            </Button>
-        </SheetTrigger>
-        <SheetContent side="bottom" className="rounded-t-2xl">
-            <SheetHeader className="text-left px-4 pt-4">
-                <SheetTitle className="text-2xl">Send a Quick Payment</SheetTitle>
-                <SheetDescription>Enter the recipient's details to send a payment instantly.</SheetDescription>
-            </SheetHeader>
-            <div className="p-4">
-                <SendForm />
-            </div>
-        </SheetContent>
-      </Sheet>
+      
+      {/* Chart Card */}
+      <Card className="md:col-span-2 lg:col-span-3 no-print">
+          <CardHeader>
+              <CardTitle>Activity Overview</CardTitle>
+              <CardDescription>January - June 2024</CardDescription>
+          </CardHeader>
+          <CardContent>
+              <ChartContainer config={chartConfig} className="w-full h-[250px] sm:h-[350px]">
+                  <BarChart accessibilityLayer data={chartData}>
+                      <CartesianGrid vertical={false} />
+                      <XAxis
+                        dataKey="month"
+                        tickLine={false}
+                        tickMargin={10}
+                        axisLine={false}
+                        tickFormatter={(value) => value.slice(0, 3)}
+                      />
+                      <YAxis tickLine={false} axisLine={false} />
+                      <ChartTooltip
+                        cursor={false}
+                        content={<ChartTooltipContent indicator="dot" />}
+                      />
+                      <ChartLegend content={<ChartLegendContent />} />
+                      <Bar dataKey="sent" fill="var(--color-sent)" radius={4} />
+                      <Bar dataKey="received" fill="var(--color-received)" radius={4} />
+                  </BarChart>
+              </ChartContainer>
+          </CardContent>
+      </Card>
+      
+      <div className="no-print">
+        <Sheet>
+            <SheetTrigger asChild>
+                <Button
+                    size="lg"
+                    className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl"
+                    aria-label="Send Payment"
+                >
+                    <Send className="h-6 w-6" />
+                </Button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="rounded-t-2xl">
+                <SheetHeader className="text-left px-4 pt-4">
+                    <SheetTitle className="text-2xl">Send a Quick Payment</SheetTitle>
+                    <SheetDescription>Enter the recipient's details to send a payment instantly.</SheetDescription>
+                </SheetHeader>
+                <div className="p-4">
+                    <SendForm />
+                </div>
+            </SheetContent>
+        </Sheet>
+      </div>
     </div>
   );
 }
-
-    

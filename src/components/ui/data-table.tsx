@@ -72,7 +72,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full space-y-4">
-      {toolbar && <DataTableToolbar table={table}>{toolbar(table)}</DataTableToolbar>}
+      {toolbar && <DataTableToolbar table={table} className="no-print">{toolbar(table)}</DataTableToolbar>}
       <div className="rounded-md border">
         <Table>
           <TableHeader>

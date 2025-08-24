@@ -8,7 +8,7 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Send, Info, Fuel, Loader2, Users, Star, MessageSquare } from 'lucide-react';
+import { Send, Info, Fuel, Loader2, Users, Star, MessageSquare, Smile } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
@@ -28,6 +28,8 @@ import { Skeleton } from '../ui/skeleton';
 import { useTransaction } from '@/context/transaction-context';
 import { useFavorites } from '@/context/favorites-context';
 import { Textarea } from '../ui/textarea';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 
 const sendFormSchema = z.object({
   phone: z.string().refine(value => {
@@ -113,6 +115,11 @@ export function SendForm() {
 
   const handleContactClick = (phone: string) => {
       form.setValue('phone', phone, { shouldValidate: true, shouldDirty: true });
+  }
+
+  const handleEmojiClick = (emojiData: EmojiClickData) => {
+    const currentNotes = form.getValues('notes') || '';
+    form.setValue('notes', currentNotes + emojiData.emoji);
   }
 
   if (loading && formData) {
@@ -215,12 +222,24 @@ export function SendForm() {
           name="notes"
           render={({ field }) => (
             <FormItem>
-                <FormLabel className="flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4" />
-                    Notes (Optional)
-                </FormLabel>
+                <div className="flex items-center justify-between">
+                    <FormLabel className="flex items-center gap-2">
+                        <MessageSquare className="h-4 w-4" />
+                        Notes (Optional)
+                    </FormLabel>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-7 w-7">
+                                <Smile className="h-4 w-4 text-muted-foreground" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0 border-0">
+                            <EmojiPicker onEmojiClick={handleEmojiClick} />
+                        </PopoverContent>
+                    </Popover>
+                </div>
                 <FormControl>
-                    <Textarea placeholder="e.g., For dinner last night" {...field} />
+                    <Textarea placeholder="e.g., For dinner last night 🍕" {...field} />
                 </FormControl>
                 <FormMessage />
             </FormItem>

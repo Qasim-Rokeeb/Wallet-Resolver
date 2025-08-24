@@ -67,7 +67,7 @@ git clone https://github.com/qasim-rokeeb/wallet-resolver
 cd wallet resolver
 
 # Install dependencies
-npm install
+npm install app
 
 # Run the development server
 npm run dev

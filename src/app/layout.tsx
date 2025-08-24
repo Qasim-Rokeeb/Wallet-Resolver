@@ -12,6 +12,7 @@ import { WalletProvider } from '@/context/wallet-context';
 import { PhoneVerificationProvider } from '@/context/phone-verification-context';
 import { AuthProvider } from '@/context/auth-context';
 import { TransactionProvider } from '@/context/transaction-context';
+import { FavoritesProvider } from '@/context/favorites-context';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
@@ -35,17 +36,19 @@ export default function RootLayout({
           <PhoneVerificationProvider>
             <WalletProvider>
               <TransactionProvider>
-                <TooltipProvider>
-                  <Navbar />
-                  <AlertBanner 
-                    title="Beta Notice:"
-                    description="This is a demo application. Do not use real wallet information."
-                    initiallyVisible={true}
-                  />
-                  <WelcomeModal />
-                  <main className="flex-grow">{children}</main>
-                  <Toaster />
-                </TooltipProvider>
+                <FavoritesProvider>
+                  <TooltipProvider>
+                    <Navbar />
+                    <AlertBanner 
+                      title="Beta Notice:"
+                      description="This is a demo application. Do not use real wallet information."
+                      initiallyVisible={true}
+                    />
+                    <WelcomeModal />
+                    <main className="flex-grow">{children}</main>
+                    <Toaster />
+                  </TooltipProvider>
+                </FavoritesProvider>
               </TransactionProvider>
             </WalletProvider>
           </PhoneVerificationProvider>

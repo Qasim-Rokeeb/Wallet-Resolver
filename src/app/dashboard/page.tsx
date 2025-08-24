@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft, Send, ListX, Clock, MoreHorizontal, Printer, Copy } from "lucide-react";
+import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft, Send, ListX, Clock, MoreHorizontal, Printer, Copy, Star } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Area, AreaChart } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,6 +20,8 @@ import { format, isToday } from 'date-fns';
 import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useToast } from "@/hooks/use-toast";
+import { useFavorites } from "@/context/favorites-context";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const balanceData = [
   { day: "Mon", balance: 4450 },
@@ -217,6 +219,24 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const { transactions } = useTransaction();
   const { toast } = useToast();
+  const { favorites, addFavorite, removeFavorite, isFavorite } = useFavorites();
+
+  const handleFavoriteToggle = (phone: string) => {
+    if (isFavorite(phone)) {
+        removeFavorite(phone);
+        toast({
+            title: "Removed from Favorites",
+            description: `${phone} has been removed from your favorites.`,
+        });
+    } else {
+        addFavorite({ phone });
+        toast({
+            variant: "success",
+            title: "Added to Favorites",
+            description: `${phone} has been added to your favorites.`,
+        });
+    }
+  }
 
   const columns: ColumnDef<Transaction>[] = [
     {
@@ -244,25 +264,8 @@ export default function DashboardPage() {
       header: ({ column }) => <DataTableColumnHeader column={column} title="Recipient/Sender" />,
       cell: ({ row }) => {
         const phone = row.getValue("phone") as string;
-        const handleCopy = () => {
-          navigator.clipboard.writeText(phone);
-          toast({
-            title: "Copied!",
-            description: "Phone number copied to clipboard.",
-          });
-        };
         return (
-          <div className="flex items-center gap-2">
-            <span className="font-mono">{phone}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 opacity-50 hover:opacity-100"
-              onClick={handleCopy}
-            >
-              <Copy className="h-3 w-3" />
-            </Button>
-          </div>
+          <span className="font-mono">{phone}</span>
         )
       },
     },
@@ -291,6 +294,55 @@ export default function DashboardPage() {
         return <span>{format(date, 'MMM d, yyyy, h:mm a')}</span>;
       },
       enableSorting: true,
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const transaction = row.original;
+        const isFav = isFavorite(transaction.phone);
+        const handleCopy = () => {
+          navigator.clipboard.writeText(transaction.phone);
+          toast({
+            title: "Copied!",
+            description: "Phone number copied to clipboard.",
+          });
+        };
+
+        return (
+          <div className="flex items-center justify-end gap-2">
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => handleFavoriteToggle(transaction.phone)}
+                    >
+                        <Star className={`h-4 w-4 ${isFav ? 'fill-amber-400 text-amber-500' : 'text-muted-foreground'}`} />
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>{isFav ? 'Remove from favorites' : 'Add to favorites'}</p>
+                </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                     <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={handleCopy}
+                    >
+                        <Copy className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>Copy phone number</p>
+                </TooltipContent>
+            </Tooltip>
+          </div>
+        )
+      },
     },
   ];
 

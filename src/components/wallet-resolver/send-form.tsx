@@ -8,7 +8,7 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Send, Info, Fuel, Loader2, Users } from 'lucide-react';
+import { Send, Info, Fuel, Loader2, Users, Star } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
@@ -26,6 +26,7 @@ import { Separator } from '../ui/separator';
 import { TransactionProgress } from './transaction-progress';
 import { Skeleton } from '../ui/skeleton';
 import { useTransaction } from '@/context/transaction-context';
+import { useFavorites } from '@/context/favorites-context';
 
 const sendFormSchema = z.object({
   phone: z.string().refine(value => {
@@ -47,6 +48,7 @@ export function SendForm() {
   const [isFetchingGas, setIsFetchingGas] = useState(false);
   const [formData, setFormData] = useState<SendFormValues | null>(null);
   const { recentRecipients } = useTransaction();
+  const { favorites } = useFavorites();
   const maxBalance = 4.52389; // Mock balance
 
   const form = useForm<SendFormValues>({
@@ -106,7 +108,7 @@ export function SendForm() {
     form.reset();
   }
 
-  const handleRecentRecipientClick = (phone: string) => {
+  const handleContactClick = (phone: string) => {
       form.setValue('phone', phone, { shouldValidate: true, shouldDirty: true });
   }
 
@@ -137,6 +139,28 @@ export function SendForm() {
             </FormItem>
           )}
         />
+        {favorites.length > 0 && (
+            <div className="space-y-2">
+                <Label className="flex items-center gap-2 text-muted-foreground">
+                    <Star className="h-4 w-4" />
+                    Favorites
+                </Label>
+                <div className="flex flex-wrap gap-2">
+                    {favorites.map((fav, index) => (
+                        <Button
+                            key={index}
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            className="text-xs h-7"
+                            onClick={() => handleContactClick(fav.phone)}
+                        >
+                            {fav.phone}
+                        </Button>
+                    ))}
+                </div>
+            </div>
+        )}
         {recentRecipients.length > 0 && (
             <div className="space-y-2">
                 <Label className="flex items-center gap-2 text-muted-foreground">
@@ -151,7 +175,7 @@ export function SendForm() {
                             variant="outline"
                             size="sm"
                             className="text-xs h-7"
-                            onClick={() => handleRecentRecipientClick(phone)}
+                            onClick={() => handleContactClick(phone)}
                         >
                             {phone}
                         </Button>

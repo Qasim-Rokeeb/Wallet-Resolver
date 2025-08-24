@@ -22,7 +22,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { PhoneInput } from '../ui/phone-input';
-import { useTransaction } from '@/context/transaction-context';
 import { Separator } from '../ui/separator';
 import { TransactionProgress } from './transaction-progress';
 import { Skeleton } from '../ui/skeleton';
@@ -43,7 +42,6 @@ export function SendForm() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
-  const { recordTransaction } = useTransaction();
   const [gasFee, setGasFee] = useState<number | null>(null);
   const [isFetchingGas, setIsFetchingGas] = useState(false);
   const [formData, setFormData] = useState<SendFormValues | null>(null);
@@ -84,7 +82,6 @@ export function SendForm() {
     setFormData(values);
     setLoading(true);
     setIsAlertOpen(false);
-    recordTransaction();
   };
 
   const handleSendMax = () => {

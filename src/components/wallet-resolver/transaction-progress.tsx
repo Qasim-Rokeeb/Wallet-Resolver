@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { CheckCircle, ArrowRight, Loader2, Cpu, Check, Send, AlertTriangle, XCircle, RefreshCw, Copy, ExternalLink } from 'lucide-react';
 import { Separator } from '../ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { useTransaction } from '@/context/transaction-context';
 
 interface TransactionProgressProps {
   transaction: {
@@ -32,6 +33,7 @@ export function TransactionProgress({ transaction, onComplete }: TransactionProg
   const [isError, setIsError] = useState(false);
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
   const { toast } = useToast();
+  const { recordTransaction } = useTransaction();
 
   useEffect(() => {
     if (isError || currentStep >= statusSteps.length - 1) {
@@ -47,14 +49,22 @@ export function TransactionProgress({ transaction, onComplete }: TransactionProg
             const nextStep = prev + 1;
             if (nextStep === statusSteps.length - 1) { // Success step
                 // Generate mock hash on success
-                setTransactionHash("0x" + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join(''));
+                const newTransactionHash = "0x" + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+                setTransactionHash(newTransactionHash);
+                recordTransaction({
+                    id: newTransactionHash,
+                    phone: transaction.phone,
+                    amount: transaction.amount,
+                    date: new Date().toISOString(),
+                    type: 'sent',
+                });
             }
             return nextStep;
         });
       }
     }, 1500);
     return () => clearTimeout(timer);
-  }, [currentStep, isError]);
+  }, [currentStep, isError, transaction, recordTransaction]);
 
   const handleRetry = () => {
       setIsError(false);

@@ -11,6 +11,12 @@ import { Button } from "@/components/ui/button";
 import { SheetFormWrapper } from "@/components/wallet-resolver/sheet-form-wrapper";
 import { SendForm } from "@/components/wallet-resolver/send-form";
 import { OnboardingChecklist } from "@/components/onboarding/onboarding-checklist";
+import { useTransaction, Transaction } from "@/context/transaction-context";
+import { DataTable } from "@/components/ui/data-table";
+import { type ColumnDef } from "@tanstack/react-table";
+import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
+import { Badge } from "@/components/ui/badge";
+import { format } from 'date-fns';
 
 const chartData = [
   { month: "January", desktop: 186 },
@@ -88,8 +94,61 @@ function DashboardSkeleton() {
     )
 }
 
+const columns: ColumnDef<Transaction>[] = [
+  {
+    accessorKey: "type",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
+    cell: ({ row }) => {
+      const type = row.getValue("type") as string;
+      const isSent = type === 'sent';
+      return (
+        <div className="flex items-center gap-2">
+            <div className={`p-2 rounded-full ${isSent ? 'bg-destructive/10' : 'bg-green-500/10'}`}>
+                {isSent ? <ArrowUpRight className="h-4 w-4 text-destructive" /> : <ArrowDownLeft className="h-4 w-4 text-green-600" />}
+            </div>
+            <span className="capitalize font-medium">{type}</span>
+        </div>
+      );
+    },
+    enableSorting: true,
+  },
+  {
+    accessorKey: "phone",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Recipient/Sender" />,
+    cell: ({ row }) => <div className="font-mono">{row.getValue("phone")}</div>,
+  },
+  {
+    accessorKey: "amount",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Amount (ETH)" />,
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("amount"));
+      const isSent = row.getValue("type") === 'sent';
+      const formatted = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "ETH",
+        minimumFractionDigits: 4,
+        maximumFractionDigits: 6,
+      }).format(amount);
+
+      return <div className={`text-right font-medium ${isSent ? 'text-destructive' : 'text-green-600'}`}>{isSent ? '-' : '+'}{formatted}</div>;
+    },
+    sortingFn: 'alphanumeric',
+  },
+   {
+    accessorKey: "date",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Date" />,
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("date"));
+      return <span>{format(date, 'MMM d, yyyy, h:mm a')}</span>;
+    },
+    enableSorting: true,
+  },
+];
+
+
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
+  const { transactions } = useTransaction();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -157,55 +216,14 @@ export default function DashboardPage() {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <List className="h-5 w-5" />
-                    Recent Transactions
+                    Transaction History
                 </CardTitle>
                 <CardDescription>
                   Here are the most recent transactions from your account.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-4">
-                <Card className="p-4 hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-destructive/10 rounded-full">
-                        <ArrowUpRight className="h-5 w-5 text-destructive" />
-                      </div>
-                      <div>
-                        <p className="font-medium">Sent to +1 (555) 123-4567</p>
-                        <p className="text-sm text-muted-foreground">2 hours ago</p>
-                      </div>
-                    </div>
-                    <p className="text-destructive font-semibold text-lg">- $50.00</p>
-                  </div>
-                </Card>
-                <Card className="p-4 hover:bg-muted/50 transition-colors">
-                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-green-500/10 rounded-full">
-                          <ArrowDownLeft className="h-5 w-5 text-green-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium">Received from +1 (555) 987-6543</p>
-                          <p className="text-sm text-muted-foreground">1 day ago</p>
-                        </div>
-                      </div>
-                      <p className="text-green-600 font-semibold text-lg">+ $120.50</p>
-                  </div>
-                </Card>
-                <Card className="p-4 hover:bg-muted/50 transition-colors">
-                   <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-destructive/10 rounded-full">
-                          <ArrowUpRight className="h-5 w-5 text-destructive" />
-                        </div>
-                        <div>
-                          <p className="font-medium">Sent to +1 (555) 555-5555</p>
-                          <p className="text-sm text-muted-foreground">3 days ago</p>
-                        </div>
-                      </div>
-                      <p className="text-destructive font-semibold text-lg">- $25.00</p>
-                  </div>
-                </Card>
+            <CardContent>
+                <DataTable columns={columns} data={transactions} />
             </CardContent>
           </Card>
         </div>

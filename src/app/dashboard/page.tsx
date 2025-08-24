@@ -17,6 +17,7 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { format } from 'date-fns';
+import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter";
 
 const chartData = [
   { month: "January", desktop: 186 },
@@ -94,6 +95,19 @@ function DashboardSkeleton() {
     )
 }
 
+const transactionTypes = [
+    {
+        label: "Sent",
+        value: "sent",
+        icon: ArrowUpRight,
+    },
+    {
+        label: "Received",
+        value: "received",
+        icon: ArrowDownLeft,
+    }
+]
+
 const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "type",
@@ -111,6 +125,9 @@ const columns: ColumnDef<Transaction>[] = [
       );
     },
     enableSorting: true,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id))
+    },
   },
   {
     accessorKey: "phone",
@@ -223,7 +240,21 @@ export default function DashboardPage() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <DataTable columns={columns} data={transactions} />
+                <DataTable 
+                    columns={columns} 
+                    data={transactions} 
+                    toolbar={(table) => (
+                         <div className="flex items-center gap-2">
+                            {table.getColumn("type") && (
+                                <DataTableFacetedFilter
+                                    column={table.getColumn("type")}
+                                    title="Type"
+                                    options={transactionTypes}
+                                />
+                            )}
+                        </div>
+                    )}
+                />
             </CardContent>
           </Card>
         </div>

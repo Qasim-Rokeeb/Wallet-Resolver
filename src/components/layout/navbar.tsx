@@ -10,6 +10,7 @@ import { WalletConnectModal } from '../wallet-resolver/wallet-connect-modal';
 import { useWallet } from '@/context/wallet-context';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { useAuth } from '@/context/auth-context';
+import { LogoutConfirmationModal } from '../auth/logout-confirmation-modal';
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -61,10 +62,12 @@ export function Navbar() {
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>{truncateAddress(walletAddress)}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleDisconnect}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Disconnect</span>
-                    </DropdownMenuItem>
+                    <LogoutConfirmationModal onConfirm={handleDisconnect}>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Disconnect</span>
+                      </DropdownMenuItem>
+                    </LogoutConfirmationModal>
                   </DropdownMenuContent>
                 </DropdownMenu>
             ) : isAuthenticated ? (
@@ -135,10 +138,12 @@ export function Navbar() {
         </div>
         <div className="p-4 border-t border-gray-200">
            {isAuthenticated && walletAddress ? (
-               <Button variant="outline" className="w-full" onClick={handleDisconnect}>
+              <LogoutConfirmationModal onConfirm={handleDisconnect}>
+                <Button variant="outline" className="w-full">
                   <LogOut className="mr-2 h-4 w-4" />
                   Disconnect ({truncateAddress(walletAddress)})
                 </Button>
+              </LogoutConfirmationModal>
            ) : isAuthenticated ? (
              <WalletConnectModal onConnect={handleConnect}>
                 <Button className="w-full" onClick={() => setIsMenuOpen(false)}>

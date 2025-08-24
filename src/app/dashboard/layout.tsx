@@ -17,6 +17,7 @@ import { usePhoneVerification } from "@/context/phone-verification-context";
 import { useAuth } from '@/context/auth-context';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Badge } from '@/components/ui/badge';
+import { LogoutConfirmationModal } from '@/components/auth/logout-confirmation-modal';
 
 export default function DashboardLayout({
   children,
@@ -141,10 +142,12 @@ export default function DashboardLayout({
                                     <span>Settings</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={logout}>
-                                    <LogOut className="mr-2 h-4 w-4" />
-                                    <span>Log out</span>
-                                </DropdownMenuItem>
+                                <LogoutConfirmationModal onConfirm={logout}>
+                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                        <LogOut className="mr-2 h-4 w-4" />
+                                        <span>Log out</span>
+                                    </DropdownMenuItem>
+                                </LogoutConfirmationModal>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>

@@ -2,10 +2,11 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, ArrowRight, Loader2, Cpu, Check, Send, AlertTriangle, XCircle, RefreshCw, Copy } from 'lucide-react';
+import { CheckCircle, ArrowRight, Loader2, Cpu, Check, Send, AlertTriangle, XCircle, RefreshCw, Copy, ExternalLink } from 'lucide-react';
 import { Separator } from '../ui/separator';
 import { useToast } from '@/hooks/use-toast';
 
@@ -201,6 +202,11 @@ export function TransactionProgress({ transaction, onComplete }: TransactionProg
                         </p>
                         <Button variant="outline" size="icon" onClick={handleCopy} aria-label="Copy transaction hash">
                             <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button asChild variant="outline" size="icon" aria-label="View on block explorer">
+                             <Link href={`https://etherscan.io/tx/${transactionHash}`} target="_blank">
+                                <ExternalLink className="h-4 w-4" />
+                            </Link>
                         </Button>
                     </div>
                 </div>

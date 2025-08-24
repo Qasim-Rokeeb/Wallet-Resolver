@@ -37,7 +37,7 @@ export function Navbar() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center gap-2 text-primary" onClick={() => setIsMenuOpen(false)}>
               <Wallet className="h-8 w-8" />
-              <span className="text-2xl font-bold">Wallet Resolver</span>
+              <span className="text-2xl font-bold font-heading">Wallet Resolver</span>
             </Link>
           </div>
           <div className="hidden md:flex items-center space-x-4">

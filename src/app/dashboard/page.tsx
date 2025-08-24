@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft, Send, ListX } from "lucide-react";
+import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft, Send, ListX, Clock, MoreHorizontal } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Area, AreaChart } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,6 +18,7 @@ import { DataTableColumnHeader } from "@/components/ui/data-table-column-header"
 import { Badge } from "@/components/ui/badge";
 import { format, isToday } from 'date-fns';
 import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 const balanceData = [
   { day: "Mon", balance: 4450 },
@@ -232,6 +233,38 @@ function EmptyState() {
   );
 }
 
+function PendingTransactions({ transactions }: { transactions: Transaction[] }) {
+    if (transactions.length === 0) {
+        return null;
+    }
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
+                    Pending Transactions
+                </CardTitle>
+                <CardDescription>
+                    These transactions are currently being processed.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="divide-y">
+                {transactions.map(tx => (
+                    <div key={tx.id} className="flex items-center justify-between py-3">
+                        <div className="flex items-center gap-4">
+                            <LoadingSpinner className="h-6 w-6" />
+                            <div>
+                                <p className="font-semibold">Sending to {tx.phone}</p>
+                                <p className="text-sm text-muted-foreground">Amount: {tx.amount.toFixed(4)} ETH</p>
+                            </div>
+                        </div>
+                        <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                ))}
+            </CardContent>
+        </Card>
+    );
+}
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
@@ -249,13 +282,17 @@ export default function DashboardPage() {
     return <DashboardSkeleton />;
   }
   
-  const todayTransactions = transactions.filter(t => isToday(new Date(t.date)));
+  const completedTransactions = transactions.filter(t => t.status === 'completed');
+  const pendingTransactions = transactions.filter(t => t.status === 'pending');
+
+  const todayTransactions = completedTransactions.filter(t => isToday(new Date(t.date)));
   const todaySent = todayTransactions.filter(t => t.type === 'sent').reduce((acc, t) => acc + t.amount, 0);
   const todayReceived = todayTransactions.filter(t => t.type === 'received').reduce((acc, t) => acc + t.amount, 0);
 
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
       <OnboardingChecklist />
+      <PendingTransactions transactions={pendingTransactions} />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Balance Card */}
         <Card>
@@ -375,7 +412,7 @@ export default function DashboardPage() {
             <CardContent>
                 <DataTable 
                     columns={columns} 
-                    data={transactions} 
+                    data={completedTransactions} 
                     toolbar={(table) => (
                          <div className="flex items-center gap-2">
                             {table.getColumn("type") && (
@@ -446,5 +483,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    

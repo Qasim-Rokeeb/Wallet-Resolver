@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, ArrowRight, Loader2, Cpu, Check, Send, AlertTriangle, XCircle, RefreshCw, Copy, ExternalLink } from 'lucide-react';
+import { CheckCircle, ArrowRight, Loader2, Cpu, Check, Send, AlertTriangle, XCircle, RefreshCw, Copy, ExternalLink, Clock, MoreHorizontal } from 'lucide-react';
 import { Separator } from '../ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useTransaction } from '@/context/transaction-context';
@@ -31,42 +31,51 @@ const statusSteps = [
 export function TransactionProgress({ transaction, onComplete }: TransactionProgressProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isError, setIsError] = useState(false);
+  const [transactionId, setTransactionId] = useState<string | null>(null);
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
   const { toast } = useToast();
-  const { recordTransaction } = useTransaction();
+  const { recordTransaction, updateTransactionStatus } = useTransaction();
 
   useEffect(() => {
-    if (isError || currentStep >= statusSteps.length - 1) {
-      return; // Stop if there's an error or it's complete
+    // Record as pending as soon as the component mounts
+    const newTransactionId = recordTransaction({
+        ...transaction,
+        type: 'sent',
+        status: 'pending'
+    });
+    setTransactionId(newTransactionId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!transactionId || isError || currentStep >= statusSteps.length - 1) {
+      return; 
     }
 
     const timer = setTimeout(() => {
       // Simulate a failure at the "Confirming" step
       if (currentStep === 2 && Math.random() < 0.4) { // 40% chance of failure
         setIsError(true);
+        updateTransactionStatus(transactionId, 'failed');
       } else {
         setCurrentStep(prev => {
             const nextStep = prev + 1;
             if (nextStep === statusSteps.length - 1) { // Success step
-                // Generate mock hash on success
                 const newTransactionHash = "0x" + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
                 setTransactionHash(newTransactionHash);
-                recordTransaction({
-                    id: newTransactionHash,
-                    phone: transaction.phone,
-                    amount: transaction.amount,
-                    date: new Date().toISOString(),
-                    type: 'sent',
-                });
+                updateTransactionStatus(transactionId, 'completed', newTransactionHash);
             }
             return nextStep;
         });
       }
     }, 1500);
     return () => clearTimeout(timer);
-  }, [currentStep, isError, transaction, recordTransaction]);
+  }, [currentStep, isError, transactionId, updateTransactionStatus]);
 
   const handleRetry = () => {
+      if (transactionId) {
+        updateTransactionStatus(transactionId, 'pending');
+      }
       setIsError(false);
       setTransactionHash(null);
       setCurrentStep(0);

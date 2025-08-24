@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft, Send, ListX, Clock, MoreHorizontal, Printer } from "lucide-react";
+import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft, Send, ListX, Clock, MoreHorizontal, Printer, Copy } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Area, AreaChart } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { format, isToday } from 'date-fns';
 import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useToast } from "@/hooks/use-toast";
 
 const balanceData = [
   { day: "Mon", balance: 4450 },
@@ -151,60 +152,6 @@ const transactionTypes = [
     }
 ]
 
-const columns: ColumnDef<Transaction>[] = [
-  {
-    accessorKey: "type",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
-    cell: ({ row }) => {
-      const type = row.getValue("type") as string;
-      const isSent = type === 'sent';
-      return (
-        <div className="flex items-center gap-2">
-            <div className={`p-2 rounded-full no-print ${isSent ? 'bg-destructive/10' : 'bg-green-500/10'}`}>
-                {isSent ? <ArrowUpRight className="h-4 w-4 text-destructive" /> : <ArrowDownLeft className="h-4 w-4 text-green-600" />}
-            </div>
-            <span className="capitalize font-medium">{type}</span>
-        </div>
-      );
-    },
-    enableSorting: true,
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
-    },
-  },
-  {
-    accessorKey: "phone",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Recipient/Sender" />,
-    cell: ({ row }) => <div className="font-mono">{row.getValue("phone")}</div>,
-  },
-  {
-    accessorKey: "amount",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Amount (ETH)" />,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
-      const isSent = row.getValue("type") === 'sent';
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "ETH",
-        minimumFractionDigits: 4,
-        maximumFractionDigits: 6,
-      }).format(amount);
-
-      return <div className={`text-right font-medium ${isSent ? 'text-destructive' : 'text-green-600'}`}>{isSent ? '-' : '+'}{formatted}</div>;
-    },
-    enableSorting: true,
-  },
-   {
-    accessorKey: "date",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Date" />,
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("date"));
-      return <span>{format(date, 'MMM d, yyyy, h:mm a')}</span>;
-    },
-    enableSorting: true,
-  },
-];
-
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center space-y-4 py-8">
@@ -269,6 +216,83 @@ function PendingTransactions({ transactions }: { transactions: Transaction[] }) 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const { transactions } = useTransaction();
+  const { toast } = useToast();
+
+  const columns: ColumnDef<Transaction>[] = [
+    {
+      accessorKey: "type",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
+      cell: ({ row }) => {
+        const type = row.getValue("type") as string;
+        const isSent = type === 'sent';
+        return (
+          <div className="flex items-center gap-2">
+              <div className={`p-2 rounded-full no-print ${isSent ? 'bg-destructive/10' : 'bg-green-500/10'}`}>
+                  {isSent ? <ArrowUpRight className="h-4 w-4 text-destructive" /> : <ArrowDownLeft className="h-4 w-4 text-green-600" />}
+              </div>
+              <span className="capitalize font-medium">{type}</span>
+          </div>
+        );
+      },
+      enableSorting: true,
+      filterFn: (row, id, value) => {
+        return value.includes(row.getValue(id))
+      },
+    },
+    {
+      accessorKey: "phone",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Recipient/Sender" />,
+      cell: ({ row }) => {
+        const phone = row.getValue("phone") as string;
+        const handleCopy = () => {
+          navigator.clipboard.writeText(phone);
+          toast({
+            title: "Copied!",
+            description: "Phone number copied to clipboard.",
+          });
+        };
+        return (
+          <div className="flex items-center gap-2">
+            <span className="font-mono">{phone}</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 opacity-50 hover:opacity-100"
+              onClick={handleCopy}
+            >
+              <Copy className="h-3 w-3" />
+            </Button>
+          </div>
+        )
+      },
+    },
+    {
+      accessorKey: "amount",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Amount (ETH)" />,
+      cell: ({ row }) => {
+        const amount = parseFloat(row.getValue("amount"));
+        const isSent = row.getValue("type") === 'sent';
+        const formatted = new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "ETH",
+          minimumFractionDigits: 4,
+          maximumFractionDigits: 6,
+        }).format(amount);
+  
+        return <div className={`text-right font-medium ${isSent ? 'text-destructive' : 'text-green-600'}`}>{isSent ? '-' : '+'}{formatted}</div>;
+      },
+      enableSorting: true,
+    },
+     {
+      accessorKey: "date",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Date" />,
+      cell: ({ row }) => {
+        const date = new Date(row.getValue("date"));
+        return <span>{format(date, 'MMM d, yyyy, h:mm a')}</span>;
+      },
+      enableSorting: true,
+    },
+  ];
 
   useEffect(() => {
     const timer = setTimeout(() => {

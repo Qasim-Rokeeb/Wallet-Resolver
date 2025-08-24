@@ -10,7 +10,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-center md:text-left">
             <p className="text-sm text-muted-foreground">
-              © 2025 by WQasim Rokeeb
+              © 2025 by Qasim Rokeeb
             </p>
           </div>
           <div className="flex items-center gap-6">

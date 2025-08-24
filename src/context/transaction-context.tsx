@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useMemo } from 'react';
 
 export type TransactionStatus = 'completed' | 'pending' | 'failed';
 
@@ -126,9 +126,14 @@ export const useTransaction = () => {
   if (context === undefined) {
     throw new Error('useTransaction must be used within a TransactionProvider');
   }
-  // Add hasSentTransaction to the returned context for OnboardingChecklist
-  const hasSentTransaction = context.transactions.some(t => t.type === 'sent');
-  return { ...context, hasSentTransaction };
-};
 
-    
+  const hasSentTransaction = context.transactions.some(t => t.type === 'sent');
+  
+  const recentRecipients = useMemo(() => {
+      const sentTransactions = context.transactions.filter(t => t.type === 'sent' && t.status === 'completed');
+      const uniquePhones = [...new Set(sentTransactions.map(t => t.phone))];
+      return uniquePhones.slice(0, 5); // Return the top 5 most recent unique recipients
+  }, [context.transactions]);
+  
+  return { ...context, hasSentTransaction, recentRecipients };
+};

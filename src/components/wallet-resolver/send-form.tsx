@@ -62,6 +62,7 @@ export function SendForm() {
   const { recordTransaction } = useTransaction();
   const [gasFee, setGasFee] = useState<number | null>(null);
   const [isFetchingGas, setIsFetchingGas] = useState(false);
+  const maxBalance = 4.52389; // Mock balance
 
   const form = useForm<SendFormValues>({
     resolver: zodResolver(sendFormSchema),
@@ -112,6 +113,20 @@ export function SendForm() {
     }, 2000);
   };
 
+  const handleSendMax = () => {
+    const fee = gasFee || 0.0005; // Use current fee or a default if not calculated
+    const maxSendable = maxBalance - fee;
+    if (maxSendable > 0) {
+        form.setValue('amount', parseFloat(maxSendable.toFixed(6)), { shouldValidate: true, shouldDirty: true });
+    } else {
+        toast({
+            variant: 'destructive',
+            title: 'Insufficient Balance',
+            description: 'Your balance is not enough to cover the gas fee.',
+        })
+    }
+  }
+
   if (loading) {
       return <SendFormSkeleton />;
   }
@@ -141,7 +156,18 @@ export function SendForm() {
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount (ETH)</FormLabel>
+              <div className="flex justify-between items-center">
+                <FormLabel>Amount (ETH)</FormLabel>
+                <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    className="h-auto p-0 text-primary"
+                    onClick={handleSendMax}
+                >
+                    Send Max
+                </Button>
+              </div>
               <FormControl>
                 <Input type="number" step="0.01" placeholder="0.1" {...field} />
               </FormControl>

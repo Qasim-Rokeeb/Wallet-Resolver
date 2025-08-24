@@ -4,8 +4,8 @@
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft, Send, ListX } from "lucide-react";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -20,17 +20,21 @@ import { format, isToday } from 'date-fns';
 import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter";
 
 const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
+  { month: "January", sent: 186, received: 80 },
+  { month: "February", sent: 305, received: 200 },
+  { month: "March", sent: 237, received: 120 },
+  { month: "April", sent: 73, received: 190 },
+  { month: "May", sent: 209, received: 130 },
+  { month: "June", sent: 214, received: 140 },
 ];
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  sent: {
+    label: "Sent",
+    color: "hsl(var(--destructive))",
+  },
+  received: {
+    label: "Received",
     color: "hsl(var(--primary))",
   },
 };
@@ -332,7 +336,7 @@ export default function DashboardPage() {
         {/* Chart Card */}
         <Card className="md:col-span-2 lg:col-span-3">
             <CardHeader>
-                <CardTitle>Spending Overview</CardTitle>
+                <CardTitle>Activity Overview</CardTitle>
                 <CardDescription>January - June 2024</CardDescription>
             </CardHeader>
             <CardContent>
@@ -340,17 +344,20 @@ export default function DashboardPage() {
                     <BarChart accessibilityLayer data={chartData}>
                         <CartesianGrid vertical={false} />
                         <XAxis
-                        dataKey="month"
-                        tickLine={false}
-                        tickMargin={10}
-                        axisLine={false}
-                        tickFormatter={(value) => value.slice(0, 3)}
+                          dataKey="month"
+                          tickLine={false}
+                          tickMargin={10}
+                          axisLine={false}
+                          tickFormatter={(value) => value.slice(0, 3)}
                         />
+                        <YAxis tickLine={false} axisLine={false} />
                         <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent indicator="dot" />}
+                          cursor={false}
+                          content={<ChartTooltipContent indicator="dot" />}
                         />
-                        <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+                        <ChartLegend content={<ChartLegendContent />} />
+                        <Bar dataKey="sent" fill="var(--color-sent)" radius={4} />
+                        <Bar dataKey="received" fill="var(--color-received)" radius={4} />
                     </BarChart>
                 </ChartContainer>
             </CardContent>

@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, ArrowRight, Loader2, Cpu, Check, Send } from 'lucide-react';
+import { CheckCircle, ArrowRight, Loader2, Cpu, Check, Send, AlertTriangle, XCircle, RefreshCw } from 'lucide-react';
 import { Separator } from '../ui/separator';
 
 interface TransactionProgressProps {
@@ -27,20 +27,70 @@ const statusSteps = [
 
 export function TransactionProgress({ transaction, onComplete }: TransactionProgressProps) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    if (currentStep < statusSteps.length - 1) {
-      const timer = setTimeout(() => {
-        setCurrentStep(prev => prev + 1);
-      }, 1500); // Simulate time for each step
-      return () => clearTimeout(timer);
+    if (isError || currentStep >= statusSteps.length - 1) {
+      return; // Stop if there's an error or it's complete
     }
-  }, [currentStep]);
+
+    const timer = setTimeout(() => {
+      // Simulate a failure at the "Confirming" step
+      if (currentStep === 2 && Math.random() < 0.4) { // 40% chance of failure
+        setIsError(true);
+      } else {
+        setCurrentStep(prev => prev + 1);
+      }
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [currentStep, isError]);
+
+  const handleRetry = () => {
+      setIsError(false);
+      setCurrentStep(0);
+  }
 
   const { status, icon, progress } = statusSteps[currentStep];
-  const isComplete = currentStep === statusSteps.length - 1;
+  const isComplete = !isError && currentStep === statusSteps.length - 1;
 
   const totalAmount = transaction.amount + transaction.gas;
+  
+  if (isError) {
+      return (
+        <Card className="w-full border-none shadow-none">
+            <CardHeader>
+                <div className="flex flex-col items-center justify-center text-center p-6 space-y-4">
+                     <XCircle className="h-24 w-24 text-destructive" />
+                    <CardTitle className="text-2xl pt-2">Transaction Failed</CardTitle>
+                    <CardDescription>
+                        Unfortunately, we were unable to process your transaction. Please try again.
+                    </CardDescription>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-2 text-sm rounded-lg bg-muted/50 p-4">
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">To:</span>
+                        <span className="font-medium">{transaction.phone}</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-base">
+                        <span>Total:</span>
+                        <span>{totalAmount.toFixed(4)} ETH</span>
+                    </div>
+                </div>
+            </CardContent>
+            <CardFooter className="grid grid-cols-2 gap-2">
+                 <Button variant="outline" onClick={onComplete}>
+                    Back to Form
+                </Button>
+                <Button onClick={handleRetry}>
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Try Again
+                </Button>
+            </CardFooter>
+        </Card>
+      )
+  }
 
   return (
     <Card className="w-full border-none shadow-none">

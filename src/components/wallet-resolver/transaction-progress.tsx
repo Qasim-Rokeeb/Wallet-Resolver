@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, ArrowRight, Loader2, Cpu, Check, Send, AlertTriangle, XCircle, RefreshCw, Copy, ExternalLink, Clock, MoreHorizontal } from 'lucide-react';
+import { CheckCircle, ArrowRight, Loader2, Cpu, Check, Send, AlertTriangle, XCircle, RefreshCw, Copy, ExternalLink, Clock, MoreHorizontal, Share2 } from 'lucide-react';
 import { Separator } from '../ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useTransaction } from '@/context/transaction-context';
@@ -88,6 +88,30 @@ export function TransactionProgress({ transaction, onComplete }: TransactionProg
         title: "Copied!",
         description: "Transaction hash copied to clipboard.",
       });
+    }
+  };
+
+  const handleShare = async () => {
+    const receiptText = `Transaction Receipt:\n- Amount: ${transaction.amount.toFixed(4)} ETH\n- To: ${transaction.phone}\n- Tx Hash: ${transactionHash}\n\nShared from Wallet Resolver.`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Transaction Receipt',
+          text: receiptText,
+        });
+        toast({ title: 'Receipt shared successfully!' });
+      } catch (error) {
+        console.error('Error sharing:', error);
+        toast({ variant: 'destructive', title: 'Could not share', description: 'There was an error trying to share your receipt.' });
+      }
+    } else {
+        // Fallback for browsers that don't support Web Share API
+        navigator.clipboard.writeText(receiptText);
+        toast({
+            title: 'Receipt Copied!',
+            description: 'Your transaction receipt has been copied to the clipboard.',
+        });
     }
   };
 
@@ -232,8 +256,12 @@ export function TransactionProgress({ transaction, onComplete }: TransactionProg
             )}
         </CardContent>
         {isComplete && (
-            <CardFooter>
-                 <Button onClick={onComplete} className="w-full">
+            <CardFooter className="grid grid-cols-2 gap-2">
+                 <Button variant="outline" onClick={handleShare}>
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Share
+                </Button>
+                 <Button onClick={onComplete}>
                     Done
                 </Button>
             </CardFooter>
@@ -241,5 +269,3 @@ export function TransactionProgress({ transaction, onComplete }: TransactionProg
     </Card>
   );
 }
-
-    

@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Send, Info, Fuel, Loader2 } from 'lucide-react';
-import { Skeleton } from '../ui/skeleton';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
@@ -25,6 +24,8 @@ import {
 import { PhoneInput } from '../ui/phone-input';
 import { useTransaction } from '@/context/transaction-context';
 import { Separator } from '../ui/separator';
+import { TransactionProgress } from './transaction-progress';
+import { Skeleton } from '../ui/skeleton';
 
 const sendFormSchema = z.object({
   phone: z.string().refine(value => {
@@ -38,23 +39,6 @@ const sendFormSchema = z.object({
 
 type SendFormValues = z.infer<typeof sendFormSchema>;
 
-
-function SendFormSkeleton() {
-    return (
-        <div className="space-y-6">
-            <div className="space-y-2">
-                <Skeleton className="h-4 w-1/3" />
-                <Skeleton className="h-10 w-full" />
-            </div>
-            <div className="space-y-2">
-                <Skeleton className="h-4 w-1/4" />
-                <Skeleton className="h-10 w-full" />
-            </div>
-            <Skeleton className="h-11 w-full" />
-        </div>
-    )
-}
-
 export function SendForm() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -62,6 +46,7 @@ export function SendForm() {
   const { recordTransaction } = useTransaction();
   const [gasFee, setGasFee] = useState<number | null>(null);
   const [isFetchingGas, setIsFetchingGas] = useState(false);
+  const [formData, setFormData] = useState<SendFormValues | null>(null);
   const maxBalance = 4.52389; // Mock balance
 
   const form = useForm<SendFormValues>({
@@ -96,21 +81,10 @@ export function SendForm() {
 
 
   const handleSubmit = (values: SendFormValues) => {
+    setFormData(values);
     setLoading(true);
     setIsAlertOpen(false);
-    setTimeout(() => {
-        // TODO: Add actual send logic
-        console.log(values);
-
-        toast({
-            title: 'Payment Sent!',
-            description: `Successfully sent ${values.amount} ETH to ${values.phone}.`,
-            variant: 'success',
-        });
-        recordTransaction();
-        setLoading(false);
-        form.reset();
-    }, 2000);
+    recordTransaction();
   };
 
   const handleSendMax = () => {
@@ -127,8 +101,17 @@ export function SendForm() {
     }
   }
 
-  if (loading) {
-      return <SendFormSkeleton />;
+  const handleTransactionComplete = () => {
+    setLoading(false);
+    setFormData(null);
+    form.reset();
+  }
+
+  if (loading && formData) {
+      return <TransactionProgress 
+                transaction={{ ...formData, gas: gasFee || 0 }} 
+                onComplete={handleTransactionComplete}
+            />;
   }
 
   const totalAmount = (amount || 0) + (gasFee || 0);
@@ -224,7 +207,7 @@ export function SendForm() {
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction onClick={() => form.handleSubmit(handleSubmit)()}>
-                {loading ? <Loader2 className="animate-spin" /> : "Confirm"}
+                Confirm
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

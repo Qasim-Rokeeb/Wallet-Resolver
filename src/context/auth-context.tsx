@@ -6,10 +6,10 @@ import { useToast } from '@/hooks/use-toast';
 import { useWallet } from './wallet-context';
 import { usePhoneVerification } from './phone-verification-context';
 import { useTransaction } from './transaction-context';
-import { SessionExpirationModal } from '@/components/auth/session-expiration-modal';
+import { SessionExpirationBanner } from '@/components/auth/session-expiration-banner';
 
 const SESSION_DURATION = 15 * 60 * 1000; // 15 minutes
-const MODAL_TIMEOUT = 2 * 60 * 1000; // 2 minutes before logout after modal shows
+const WARNING_COUNTDOWN_SECONDS = 2 * 60; // 2 minutes
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -33,9 +33,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const phoneVerificationContext = usePhoneVerification();
   const transactionContext = useTransaction();
 
-  const [showExpirationModal, setShowExpirationModal] = useState(false);
+  const [showExpirationWarning, setShowExpirationWarning] = useState(false);
   const [sessionTimeoutId, setSessionTimeoutId] = useState<NodeJS.Timeout | null>(null);
-  const [modalTimeoutId, setModalTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [warningTimeoutId, setWarningTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   const logout = useCallback(() => {
     setIsAuthenticated(false);
@@ -49,59 +49,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     toast({
         title: 'Logged Out',
-        description: 'You have been successfully logged out.',
+        description: 'You have been successfully logged out for security reasons.',
     });
     
-    // Cleanup timers and modal state
     if (sessionTimeoutId) clearTimeout(sessionTimeoutId);
-    if (modalTimeoutId) clearTimeout(modalTimeoutId);
+    if (warningTimeoutId) clearTimeout(warningTimeoutId);
     setSessionTimeoutId(null);
-    setModalTimeoutId(null);
-    setShowExpirationModal(false);
-  }, [walletContext, phoneVerificationContext, transactionContext, toast, sessionTimeoutId, modalTimeoutId]);
+    setWarningTimeoutId(null);
+    setShowExpirationWarning(false);
+  }, [walletContext, phoneVerificationContext, transactionContext, toast, sessionTimeoutId, warningTimeoutId]);
 
   const extendSession = useCallback(() => {
-    // This is the auto-refresh handler. It silently extends the session.
     if (sessionTimeoutId) clearTimeout(sessionTimeoutId);
-    if (modalTimeoutId) clearTimeout(modalTimeoutId);
+    if (warningTimeoutId) clearTimeout(warningTimeoutId);
     
-    setShowExpirationModal(false);
+    setShowExpirationWarning(false);
 
     if (isAuthenticated) {
-        // Set a new timer to show the expiration modal after inactivity
         const newSessionTimeout = setTimeout(() => {
-            setShowExpirationModal(true);
-            // After modal is shown, set another timer to auto-logout
-            const newModalTimeout = setTimeout(logout, MODAL_TIMEOUT);
-            setModalTimeoutId(newModalTimeout);
+            setShowExpirationWarning(true);
+            const newWarningTimeout = setTimeout(logout, WARNING_COUNTDOWN_SECONDS * 1000);
+            setWarningTimeoutId(newWarningTimeout);
         }, SESSION_DURATION);
         setSessionTimeoutId(newSessionTimeout);
     }
-  }, [isAuthenticated, sessionTimeoutId, modalTimeoutId, logout]);
+  }, [isAuthenticated, sessionTimeoutId, warningTimeoutId, logout]);
 
   useEffect(() => {
-    // These events are used to detect user activity
     const activityEvents: (keyof WindowEventMap)[] = ['mousemove', 'keydown', 'mousedown', 'touchstart'];
-    
     const activityHandler = () => extendSession();
 
     if (isAuthenticated) {
-        // Add listeners for user activity
         activityEvents.forEach(event => window.addEventListener(event, activityHandler));
-        // Initialize the session timer
         extendSession();
     } else {
-        // Cleanup when not authenticated
         activityEvents.forEach(event => window.removeEventListener(event, activityHandler));
     }
 
     return () => {
-        // Cleanup on component unmount
         activityEvents.forEach(event => window.removeEventListener(event, activityHandler));
         if (sessionTimeoutId) clearTimeout(sessionTimeoutId);
-        if (modalTimeoutId) clearTimeout(modalTimeoutId);
+        if (warningTimeoutId) clearTimeout(warningTimeoutId);
     };
-    // extendSession is the key dependency here
   }, [isAuthenticated, extendSession]);
 
   useEffect(() => {
@@ -126,12 +115,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, isLoading, userPhone, login, logout }}>
-      {children}
-      <SessionExpirationModal 
-        isOpen={showExpirationModal}
+      <SessionExpirationBanner
+        isOpen={showExpirationWarning}
         onExtend={extendSession}
         onLogout={logout}
+        countdownSeconds={WARNING_COUNTDOWN_SECONDS}
       />
+      {children}
     </AuthContext.Provider>
   );
 };

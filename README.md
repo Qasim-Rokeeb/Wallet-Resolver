@@ -64,7 +64,7 @@ The system is designed to be simple and secure.
 ```bash
 # Clone the repository
 git clone https://github.com/qasim-rokeeb/wallet-resolver
-cd https://github.com/qasim-rokeeb/wallet-resolver
+cd wallet resolver
 
 # Install dependencies
 npm install

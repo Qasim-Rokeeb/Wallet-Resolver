@@ -67,7 +67,7 @@ git clone https://github.com/qasim-rokeeb/wallet-resolver
 cd wallet resolver
 
 # Install dependencies
-npm install app
+npm install
 
 # Run the development server
 npm run dev
@@ -78,3 +78,6 @@ npm run dev
 
 ## 📄 License
 This project is licensed under the MIT License.
+
+## 🙌 Support
+Contact Rokeeb at https://x.com/qasimrokeebs

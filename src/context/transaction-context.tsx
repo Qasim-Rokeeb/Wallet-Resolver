@@ -130,3 +130,5 @@ export const useTransaction = () => {
   const hasSentTransaction = context.transactions.some(t => t.type === 'sent');
   return { ...context, hasSentTransaction };
 };
+
+    

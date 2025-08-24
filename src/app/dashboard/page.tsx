@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft, Send, ListX } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Area, AreaChart } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -19,6 +19,16 @@ import { Badge } from "@/components/ui/badge";
 import { format, isToday } from 'date-fns';
 import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter";
 
+const balanceData = [
+  { day: "Mon", balance: 4450 },
+  { day: "Tue", balance: 4480 },
+  { day: "Wed", balance: 4500 },
+  { day: "Thu", balance: 4510 },
+  { day: "Fri", balance: 4550 },
+  { day: "Sat", balance: 4540 },
+  { day: "Sun", balance: 4523.89 },
+]
+
 const chartData = [
   { month: "January", sent: 186, received: 80 },
   { month: "February", sent: 305, received: 200 },
@@ -29,6 +39,10 @@ const chartData = [
 ];
 
 const chartConfig = {
+  balance: {
+    label: "Balance",
+    color: "hsl(var(--primary))",
+  },
   sent: {
     label: "Sent",
     color: "hsl(var(--destructive))",
@@ -253,9 +267,55 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">$4,523.89</div>
-            <p className="text-xs text-muted-foreground">
-              +20.1% from last month
-            </p>
+             <div className="h-8">
+                <ChartContainer config={chartConfig} className="w-full h-full -ml-4">
+                    <AreaChart
+                        accessibilityLayer
+                        data={balanceData}
+                        margin={{
+                            left: 12,
+                            right: 12,
+                        }}
+                    >
+                        <defs>
+                            <linearGradient id="fillBalance" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="var(--color-balance)" stopOpacity={0.8} />
+                                <stop offset="95%" stopColor="var(--color-balance)" stopOpacity={0.1} />
+                            </linearGradient>
+                        </defs>
+                        <ChartTooltip 
+                            cursor={false} 
+                            content={({ active, payload }) => {
+                                if (active && payload && payload.length) {
+                                return (
+                                    <div className="rounded-lg border bg-background p-2 shadow-sm">
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div className="flex flex-col">
+                                            <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                                Balance
+                                            </span>
+                                            <span className="font-bold text-muted-foreground">
+                                                ${payload[0].value}
+                                            </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                                }
+                                return null
+                            }} 
+                        />
+                        <Area
+                            dataKey="balance"
+                            type="natural"
+                            fill="url(#fillBalance)"
+                            fillOpacity={0.4}
+                            stroke="var(--color-balance)"
+                            stackId="a"
+                        />
+                    </AreaChart>
+                </ChartContainer>
+            </div>
           </CardContent>
         </Card>
 
@@ -386,3 +446,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    

@@ -149,7 +149,7 @@ const columns: ColumnDef<Transaction>[] = [
 
       return <div className={`text-right font-medium ${isSent ? 'text-destructive' : 'text-green-600'}`}>{isSent ? '-' : '+'}{formatted}</div>;
     },
-    sortingFn: 'alphanumeric',
+    enableSorting: true,
   },
    {
     accessorKey: "date",

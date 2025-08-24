@@ -5,8 +5,9 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, ArrowRight, Loader2, Cpu, Check, Send, AlertTriangle, XCircle, RefreshCw } from 'lucide-react';
+import { CheckCircle, ArrowRight, Loader2, Cpu, Check, Send, AlertTriangle, XCircle, RefreshCw, Copy } from 'lucide-react';
 import { Separator } from '../ui/separator';
+import { useToast } from '@/hooks/use-toast';
 
 interface TransactionProgressProps {
   transaction: {
@@ -28,6 +29,8 @@ const statusSteps = [
 export function TransactionProgress({ transaction, onComplete }: TransactionProgressProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isError, setIsError] = useState(false);
+  const [transactionHash, setTransactionHash] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (isError || currentStep >= statusSteps.length - 1) {
@@ -39,7 +42,14 @@ export function TransactionProgress({ transaction, onComplete }: TransactionProg
       if (currentStep === 2 && Math.random() < 0.4) { // 40% chance of failure
         setIsError(true);
       } else {
-        setCurrentStep(prev => prev + 1);
+        setCurrentStep(prev => {
+            const nextStep = prev + 1;
+            if (nextStep === statusSteps.length - 1) { // Success step
+                // Generate mock hash on success
+                setTransactionHash("0x" + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join(''));
+            }
+            return nextStep;
+        });
       }
     }, 1500);
     return () => clearTimeout(timer);
@@ -47,8 +57,19 @@ export function TransactionProgress({ transaction, onComplete }: TransactionProg
 
   const handleRetry = () => {
       setIsError(false);
+      setTransactionHash(null);
       setCurrentStep(0);
   }
+
+  const handleCopy = () => {
+    if (transactionHash) {
+      navigator.clipboard.writeText(transactionHash);
+      toast({
+        title: "Copied!",
+        description: "Transaction hash copied to clipboard.",
+      });
+    }
+  };
 
   const { status, icon, progress } = statusSteps[currentStep];
   const isComplete = !isError && currentStep === statusSteps.length - 1;
@@ -170,6 +191,20 @@ export function TransactionProgress({ transaction, onComplete }: TransactionProg
                     <span>{totalAmount.toFixed(4)} ETH</span>
                 </div>
             </div>
+
+            {isComplete && transactionHash && (
+                <div className="space-y-2 text-sm">
+                    <div className="text-muted-foreground font-medium">Transaction Hash</div>
+                    <div className="flex items-center gap-2">
+                        <p className="font-mono text-xs truncate bg-muted/50 p-2 rounded-md flex-grow">
+                            {transactionHash}
+                        </p>
+                        <Button variant="outline" size="icon" onClick={handleCopy} aria-label="Copy transaction hash">
+                            <Copy className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            )}
         </CardContent>
         {isComplete && (
             <CardFooter>

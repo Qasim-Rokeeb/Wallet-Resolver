@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft, Send, ListX, Clock, MoreHorizontal, Printer, Copy, Star } from "lucide-react";
+import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft, Send, ListX, Clock, MoreHorizontal, Printer, Copy, Star, ChevronDown, MessageSquare } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Area, AreaChart } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton";
@@ -22,6 +22,8 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useToast } from "@/hooks/use-toast";
 import { useFavorites } from "@/context/favorites-context";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const balanceData = [
   { day: "Mon", balance: 4450 },
@@ -240,6 +242,19 @@ export default function DashboardPage() {
 
   const columns: ColumnDef<Transaction>[] = [
     {
+      id: 'expander',
+      header: () => null,
+      cell: ({ row }) => {
+        return (
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8" disabled={!row.original.notes && !row.original.hash}>
+                <ChevronDown className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            </Button>
+          </CollapsibleTrigger>
+        )
+      },
+    },
+    {
       accessorKey: "type",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
       cell: ({ row }) => {
@@ -316,7 +331,7 @@ export default function DashboardPage() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => handleFavoriteToggle(transaction.phone)}
+                        onClick={(e) => { e.stopPropagation(); handleFavoriteToggle(transaction.phone); }}
                     >
                         <Star className={`h-4 w-4 ${isFav ? 'fill-amber-400 text-amber-500' : 'text-muted-foreground'}`} />
                     </Button>
@@ -331,7 +346,7 @@ export default function DashboardPage() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={handleCopy}
+                        onClick={(e) => { e.stopPropagation(); handleCopy(); }}
                     >
                         <Copy className="h-4 w-4 text-muted-foreground" />
                     </Button>
@@ -514,6 +529,29 @@ export default function DashboardPage() {
                         </div>
                   )}
                   emptyState={<EmptyState />}
+                  expandableContent={({data}) => (
+                    <div className="bg-muted/50 p-4">
+                        <h4 className="font-semibold mb-2">Transaction Details</h4>
+                        {data.notes && (
+                            <div className="flex items-start gap-2 mb-2">
+                                <MessageSquare className="h-4 w-4 mt-1 text-muted-foreground" />
+                                <div className="flex-1">
+                                    <p className="text-sm font-semibold">Notes</p>
+                                    <p className="text-sm text-muted-foreground italic">"{data.notes}"</p>
+                                </div>
+                            </div>
+                        )}
+                         {data.hash && (
+                            <div className="flex items-start gap-2">
+                                <CreditCard className="h-4 w-4 mt-1 text-muted-foreground" />
+                                <div className="flex-1">
+                                    <p className="text-sm font-semibold">Transaction Hash</p>
+                                    <p className="text-sm text-muted-foreground font-mono truncate">{data.hash}</p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                  )}
               />
           </CardContent>
         </Card>

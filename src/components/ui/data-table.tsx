@@ -26,19 +26,22 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { DataTableToolbar } from "./data-table-toolbar"
+import { Collapsible, CollapsibleContent } from "./collapsible"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   toolbar?: (table: ReactTable<TData>) => React.ReactNode
   emptyState?: React.ReactNode
+  expandableContent?: (row: TData) => React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   toolbar,
-  emptyState
+  emptyState,
+  expandableContent,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
@@ -96,19 +99,32 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                <Collapsible asChild key={row.id} className="group">
+                    <>
+                    <TableRow
+                      data-state={row.getIsSelected() && "selected"}
+                      className="cursor-pointer"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                    {expandableContent && (
+                        <CollapsibleContent asChild>
+                            <tr>
+                                <TableCell colSpan={columns.length}>
+                                    {expandableContent(row.original)}
+                                </TableCell>
+                            </tr>
+                        </CollapsibleContent>
+                    )}
+                    </>
+                </Collapsible>
               ))
             ) : (
               <TableRow>

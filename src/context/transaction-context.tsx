@@ -13,6 +13,7 @@ export interface Transaction {
     date: string;
     status: TransactionStatus;
     hash?: string;
+    notes?: string;
 }
 
 interface TransactionContextType {
@@ -35,7 +36,8 @@ const initialMockTransactions: Transaction[] = [
         amount: 0.1, // Approx $350
         date: new Date().toISOString(),
         status: 'completed',
-        hash: '0x' + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('')
+        hash: '0x' + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join(''),
+        notes: 'Invoice #123 payment'
     },
     {
         id: 'tx_1',
@@ -53,7 +55,8 @@ const initialMockTransactions: Transaction[] = [
         amount: 0.007, // Approx $25.00
         date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
         status: 'completed',
-        hash: '0x' + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('')
+        hash: '0x' + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join(''),
+        notes: 'Coffee with Sarah'
     }
 ];
 
@@ -85,6 +88,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         amount: transaction.amount,
         date: transaction.date || new Date().toISOString(),
         status: transaction.status || 'pending',
+        notes: transaction.notes,
     };
 
     setTransactions(prevTransactions => {

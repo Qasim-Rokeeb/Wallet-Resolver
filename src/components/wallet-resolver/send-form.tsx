@@ -8,7 +8,7 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Send, Info, Fuel, Loader2, Users, Star } from 'lucide-react';
+import { Send, Info, Fuel, Loader2, Users, Star, MessageSquare } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
@@ -27,6 +27,7 @@ import { TransactionProgress } from './transaction-progress';
 import { Skeleton } from '../ui/skeleton';
 import { useTransaction } from '@/context/transaction-context';
 import { useFavorites } from '@/context/favorites-context';
+import { Textarea } from '../ui/textarea';
 
 const sendFormSchema = z.object({
   phone: z.string().refine(value => {
@@ -36,6 +37,7 @@ const sendFormSchema = z.object({
         return /^\d{7,15}$/.test(number);
     }, { message: "Please enter a valid phone number." }),
   amount: z.coerce.number().positive({ message: "Amount must be positive." }),
+  notes: z.string().max(100, { message: "Note must be 100 characters or less." }).optional(),
 });
 
 type SendFormValues = z.infer<typeof sendFormSchema>;
@@ -56,6 +58,7 @@ export function SendForm() {
     defaultValues: {
       phone: '',
       amount: undefined,
+      notes: '',
     },
   });
 
@@ -204,6 +207,22 @@ export function SendForm() {
                 <Input type="number" step="0.01" placeholder="0.1" {...field} />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4" />
+                    Notes (Optional)
+                </FormLabel>
+                <FormControl>
+                    <Textarea placeholder="e.g., For dinner last night" {...field} />
+                </FormControl>
+                <FormMessage />
             </FormItem>
           )}
         />

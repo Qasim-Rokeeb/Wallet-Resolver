@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, ArrowRight, Loader2, Cpu, Check, Send, AlertTriangle, XCircle, RefreshCw, Copy, ExternalLink, Clock, MoreHorizontal, Share2 } from 'lucide-react';
+import { CheckCircle, ArrowRight, Loader2, Cpu, Check, Send, AlertTriangle, XCircle, RefreshCw, Copy, ExternalLink, Clock, MoreHorizontal, Share2, MessageSquare } from 'lucide-react';
 import { Separator } from '../ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useTransaction } from '@/context/transaction-context';
@@ -16,6 +16,7 @@ interface TransactionProgressProps {
     phone: string;
     amount: number;
     gas: number;
+    notes?: string;
   };
   onComplete: () => void;
 }
@@ -92,8 +93,12 @@ export function TransactionProgress({ transaction, onComplete }: TransactionProg
   };
 
   const handleShare = async () => {
-    const receiptText = `Transaction Receipt:\n- Amount: ${transaction.amount.toFixed(4)} ETH\n- To: ${transaction.phone}\n- Tx Hash: ${transactionHash}\n\nShared from Wallet Resolver.`;
-    
+    let receiptText = `Transaction Receipt:\n- Amount: ${transaction.amount.toFixed(4)} ETH\n- To: ${transaction.phone}\n- Tx Hash: ${transactionHash}`;
+    if (transaction.notes) {
+      receiptText += `\n- Notes: ${transaction.notes}`;
+    }
+    receiptText += `\n\nShared from Wallet Resolver.`;
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -138,6 +143,12 @@ export function TransactionProgress({ transaction, onComplete }: TransactionProg
                         <span className="text-muted-foreground">To:</span>
                         <span className="font-medium">{transaction.phone}</span>
                     </div>
+                    {transaction.notes && (
+                      <div className="flex justify-between">
+                          <span className="text-muted-foreground">Notes:</span>
+                          <span className="font-medium">{transaction.notes}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between font-bold text-base">
                         <span>Total:</span>
                         <span>{totalAmount.toFixed(4)} ETH</span>
@@ -230,7 +241,13 @@ export function TransactionProgress({ transaction, onComplete }: TransactionProg
                     <span className="text-muted-foreground">Gas Fee:</span>
                     <span className="font-medium">{transaction.gas.toFixed(4)} ETH</span>
                 </div>
-                 <div className="flex justify-between font-bold text-base">
+                {transaction.notes && (
+                  <div className="flex justify-between pt-2">
+                    <span className="text-muted-foreground flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Notes:</span>
+                    <span className="font-medium italic">"{transaction.notes}"</span>
+                  </div>
+                )}
+                 <div className="flex justify-between font-bold text-base pt-2 border-t mt-2">
                     <span>Total:</span>
                     <span>{totalAmount.toFixed(4)} ETH</span>
                 </div>

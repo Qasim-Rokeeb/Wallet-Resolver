@@ -24,6 +24,13 @@ const TRANSACTIONS_KEY = 'transactions_history';
 // Mock data for initial state
 const initialMockTransactions: Transaction[] = [
     {
+        id: 'tx_today_1',
+        type: 'received',
+        phone: '+1 (555) 111-2222',
+        amount: 0.1, // Approx $350
+        date: new Date().toISOString(), 
+    },
+    {
         id: 'tx_1',
         type: 'received',
         phone: '+1 (555) 987-6543',

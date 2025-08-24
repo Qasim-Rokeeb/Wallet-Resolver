@@ -16,7 +16,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { type ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
-import { format } from 'date-fns';
+import { format, isToday } from 'date-fns';
 import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter";
 
 const chartData = [
@@ -230,6 +230,10 @@ export default function DashboardPage() {
   if (loading) {
     return <DashboardSkeleton />;
   }
+  
+  const todayTransactions = transactions.filter(t => isToday(new Date(t.date)));
+  const todaySent = todayTransactions.filter(t => t.type === 'sent').reduce((acc, t) => acc + t.amount, 0);
+  const todayReceived = todayTransactions.filter(t => t.type === 'received').reduce((acc, t) => acc + t.amount, 0);
 
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
@@ -251,17 +255,30 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Subscriptions Card */}
+        {/* Daily Summary Card */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Subscriptions</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">
+              Daily Summary
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+2350</div>
-            <p className="text-xs text-muted-foreground">
-              +180.1% from last month
-            </p>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm text-destructive">
+                      <ArrowUpRight className="h-4 w-4" />
+                      <span>Sent</span>
+                  </div>
+                  <span className="font-semibold">{todaySent.toFixed(4)} ETH</span>
+              </div>
+              <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm text-green-600">
+                      <ArrowDownLeft className="h-4 w-4" />
+                      <span>Received</span>
+                  </div>
+                  <span className="font-semibold">{todayReceived.toFixed(4)} ETH</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
 

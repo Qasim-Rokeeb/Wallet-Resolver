@@ -3,12 +3,12 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft, Send } from "lucide-react";
+import { DollarSign, List, CreditCard, Activity, ArrowUpRight, ArrowDownLeft, Send, ListX } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { SheetFormWrapper } from "@/components/wallet-resolver/sheet-form-wrapper";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { SendForm } from "@/components/wallet-resolver/send-form";
 import { OnboardingChecklist } from "@/components/onboarding/onboarding-checklist";
 import { useTransaction, Transaction } from "@/context/transaction-context";
@@ -162,6 +162,34 @@ const columns: ColumnDef<Transaction>[] = [
   },
 ];
 
+function EmptyState() {
+  return (
+    <div className="flex flex-col items-center justify-center space-y-4 py-8">
+      <div className="p-4 bg-muted rounded-full">
+        <ListX className="h-12 w-12 text-muted-foreground" />
+      </div>
+      <h3 className="text-xl font-semibold">No transactions yet</h3>
+      <p className="text-muted-foreground">Send your first payment to see it here.</p>
+      <Sheet>
+        <SheetTrigger asChild>
+            <Button>
+                <Send className="mr-2 h-4 w-4" /> Send Payment
+            </Button>
+        </SheetTrigger>
+        <SheetContent side="bottom" className="rounded-t-2xl">
+            <SheetHeader className="text-left px-4 pt-4">
+                <SheetTitle className="text-2xl">Send a Quick Payment</SheetTitle>
+                <SheetDescription>Enter the recipient's details to send a payment instantly.</SheetDescription>
+            </SheetHeader>
+            <div className="p-4">
+                <SendForm />
+            </div>
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
+
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
@@ -254,6 +282,7 @@ export default function DashboardPage() {
                             )}
                         </div>
                     )}
+                    emptyState={<EmptyState />}
                 />
             </CardContent>
           </Card>
@@ -286,10 +315,8 @@ export default function DashboardPage() {
             </CardContent>
         </Card>
       </div>
-      <SheetFormWrapper
-        title="Send a Quick Payment"
-        description="Enter the recipient's details to send a payment instantly."
-        trigger={
+      <Sheet>
+        <SheetTrigger asChild>
             <Button
                 size="lg"
                 className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl"
@@ -297,10 +324,17 @@ export default function DashboardPage() {
             >
                 <Send className="h-6 w-6" />
             </Button>
-        }
-    >
-        <SendForm />
-    </SheetFormWrapper>
+        </SheetTrigger>
+        <SheetContent side="bottom" className="rounded-t-2xl">
+            <SheetHeader className="text-left px-4 pt-4">
+                <SheetTitle className="text-2xl">Send a Quick Payment</SheetTitle>
+                <SheetDescription>Enter the recipient's details to send a payment instantly.</SheetDescription>
+            </SheetHeader>
+            <div className="p-4">
+                <SendForm />
+            </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

@@ -19,6 +19,7 @@ This MVP uses an **off-chain phone-to-wallet mapping** for speed and seamless on
 - **Framework**: Next.js (React) for a fast, server-rendered user interface.
 - **Styling**: Tailwind CSS for a utility-first, modern design system.
 - **Components**: ShadCN UI for beautiful, accessible components.
+- ** New Improvvements**
 
 ---
 

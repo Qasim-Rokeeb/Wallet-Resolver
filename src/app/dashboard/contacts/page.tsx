@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus, Search, Send } from "lucide-react";
+import { MoreHorizontal, Plus, Search, Send, Upload } from "lucide-react";
 import { useFavorites } from '@/context/favorites-context';
 import type { Favorite } from '@/context/favorites-context';
 
@@ -27,10 +27,16 @@ export default function ContactsPage() {
                     <h1 className="text-3xl font-bold">Contacts</h1>
                     <p className="text-muted-foreground">Manage your saved contacts.</p>
                 </div>
-                <Button>
-                    <Plus className="mr-2" />
-                    Add Contact
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button variant="outline">
+                        <Upload className="mr-2" />
+                        Import Contacts
+                    </Button>
+                    <Button>
+                        <Plus className="mr-2" />
+                        Add Contact
+                    </Button>
+                </div>
             </div>
 
             <div className="relative">

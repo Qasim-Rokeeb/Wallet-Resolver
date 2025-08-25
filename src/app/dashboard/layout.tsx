@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Footer } from "@/components/layout/footer";
 import { Sidebar, SidebarProvider, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { LayoutDashboard, Send, UserPlus, Home, Wallet, User, Settings, LogOut, CheckCircle, AlertTriangle } from "lucide-react";
+import { LayoutDashboard, Send, UserPlus, Home, Wallet, User, Settings, LogOut, CheckCircle, AlertTriangle, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { Breadcrumbs } from "@/components/ui/breadcrumb";
@@ -60,6 +60,14 @@ export default function DashboardLayout({
                             <Link href="/dashboard">
                                 <LayoutDashboard />
                                 <span>Dashboard</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                     <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={isActive('/dashboard/contacts')}>
+                            <Link href="/dashboard/contacts">
+                                <Users />
+                                <span>Contacts</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

@@ -3,5 +3,9 @@
     "/dashboard": {
         "title": "Dashboard",
         "href": "/dashboard"
+    },
+    "/dashboard/contacts": {
+        "title": "Contacts",
+        "href": "/dashboard/contacts"
     }
 }

@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -7,7 +8,7 @@ import { ArrowRight } from "lucide-react"
 
 export function Hero() {
   return (
-    <section className="w-full bg-white/50 border-b backdrop-blur-sm">
+    <section className="w-full bg-white/50 border backdrop-blur-sm">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center px-4 sm:px-6 lg:px-8 py-16 md:py-24">
         <div className="space-y-6 text-center md:text-left">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-primary">

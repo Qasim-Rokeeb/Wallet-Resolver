@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, AlertTriangle, ArrowLeft, Loader2, RefreshCw } from 'lucide-react';
+import { CheckCircle, AlertTriangle, ArrowLeft, Loader2, RefreshCw, X } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Skeleton } from '../ui/skeleton';
@@ -61,6 +61,8 @@ export function OtpForm({ phone, onSuccess, onBack }: OtpFormProps) {
       otp: '',
     },
   });
+
+  const otpValue = form.watch('otp');
 
   useEffect(() => {
     let cooldownTimer: NodeJS.Timeout;
@@ -120,7 +122,7 @@ export function OtpForm({ phone, onSuccess, onBack }: OtpFormProps) {
     }, 2000);
   };
 
-  const handleTryAgain = () => {
+  const handleReset = () => {
     setVerificationFailed(false);
     form.reset();
   }
@@ -150,16 +152,29 @@ export function OtpForm({ phone, onSuccess, onBack }: OtpFormProps) {
             <FormItem className="flex flex-col items-center">
               <FormLabel className="sr-only">One-Time Password</FormLabel>
               <FormControl>
-                <InputOTP maxLength={6} {...field} disabled={isExpired || verificationFailed}>
-                    <InputOTPGroup>
-                        <InputOTPSlot index={0} />
-                        <InputOTPSlot index={1} />
-                        <InputOTPSlot index={2} />
-                        <InputOTPSlot index={3} />
-                        <InputOTPSlot index={4} />
-                        <InputOTPSlot index={5} />
-                    </InputOTPGroup>
-                </InputOTP>
+                <div className="relative">
+                    <InputOTP maxLength={6} {...field} disabled={isExpired || verificationFailed}>
+                        <InputOTPGroup>
+                            <InputOTPSlot index={0} />
+                            <InputOTPSlot index={1} />
+                            <InputOTPSlot index={2} />
+                            <InputOTPSlot index={3} />
+                            <InputOTPSlot index={4} />
+                            <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                    </InputOTP>
+                    {otpValue && (
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
+                            onClick={handleReset}
+                        >
+                            <X className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                    )}
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -177,7 +192,7 @@ export function OtpForm({ phone, onSuccess, onBack }: OtpFormProps) {
         </div>
         
         {verificationFailed ? (
-            <Button type="button" variant="destructive" className="w-full" onClick={handleTryAgain}>
+            <Button type="button" variant="destructive" className="w-full" onClick={handleReset}>
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Try Again
             </Button>

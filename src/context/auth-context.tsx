@@ -59,47 +59,51 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setShowExpirationWarning(false);
   }, [walletContext, phoneVerificationContext, transactionContext, toast, sessionTimeoutId, warningTimeoutId]);
 
-  const extendSession = useCallback(() => {
-    if (sessionTimeoutId) clearTimeout(sessionTimeoutId);
+  const startSessionTimers = useCallback(() => {
     if (warningTimeoutId) clearTimeout(warningTimeoutId);
-    
-    setShowExpirationWarning(false);
+    if (sessionTimeoutId) clearTimeout(sessionTimeoutId);
 
-    if (isAuthenticated) {
-        const newSessionTimeout = setTimeout(() => {
-            setShowExpirationWarning(true);
-            const newWarningTimeout = setTimeout(logout, WARNING_COUNTDOWN_SECONDS * 1000);
-            setWarningTimeoutId(newWarningTimeout);
-        }, SESSION_DURATION);
-        setSessionTimeoutId(newSessionTimeout);
-    }
-  }, [isAuthenticated, sessionTimeoutId, warningTimeoutId, logout]);
+    const warningTimeout = setTimeout(() => {
+        setShowExpirationWarning(true);
+        const logoutTimeout = setTimeout(logout, WARNING_COUNTDOWN_SECONDS * 1000);
+        setWarningTimeoutId(logoutTimeout);
+    }, SESSION_DURATION - (WARNING_COUNTDOWN_SECONDS * 1000));
+    setSessionTimeoutId(warningTimeout);
+  }, [logout, sessionTimeoutId, warningTimeoutId]);
+  
+  const extendSession = useCallback(() => {
+    setShowExpirationWarning(false);
+    startSessionTimers();
+  }, [startSessionTimers]);
+
 
   useEffect(() => {
     const activityEvents: (keyof WindowEventMap)[] = ['mousemove', 'keydown', 'mousedown', 'touchstart'];
-    const activityHandler = () => extendSession();
+    
+    const activityHandler = () => {
+        if (isAuthenticated) {
+            extendSession();
+        }
+    };
 
-    if (isAuthenticated) {
-        activityEvents.forEach(event => window.addEventListener(event, activityHandler));
-        extendSession();
-    } else {
-        activityEvents.forEach(event => window.removeEventListener(event, activityHandler));
-    }
+    activityEvents.forEach(event => window.addEventListener(event, activityHandler));
 
     return () => {
         activityEvents.forEach(event => window.removeEventListener(event, activityHandler));
         if (sessionTimeoutId) clearTimeout(sessionTimeoutId);
         if (warningTimeoutId) clearTimeout(warningTimeoutId);
     };
-  }, [isAuthenticated, extendSession]);
+  }, [isAuthenticated, extendSession, sessionTimeoutId, warningTimeoutId]);
 
   useEffect(() => {
     const storedPhone = localStorage.getItem(AUTH_USER_PHONE_KEY) || sessionStorage.getItem(AUTH_USER_PHONE_KEY);
     if (storedPhone) {
       setUserPhone(storedPhone);
       setIsAuthenticated(true);
+      startSessionTimers();
     }
     setIsLoading(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const login = (phone: string, rememberMe = false) => {
@@ -110,6 +114,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } else {
         sessionStorage.setItem(AUTH_USER_PHONE_KEY, phone);
     }
+    startSessionTimers();
   };
 
 

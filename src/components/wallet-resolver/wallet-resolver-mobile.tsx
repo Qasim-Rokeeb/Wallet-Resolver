@@ -11,7 +11,7 @@ export function WalletResolverMobile() {
     return (
         <Card className="w-full max-w-md mx-auto shadow-2xl rounded-2xl overflow-hidden border-2 border-primary/10">
             <CardHeader className="text-center p-6 relative">
-                <CardTitle className="text-3xl font-bold text-primary">Wallet Resolver</CardTitle>
+                <CardTitle className="text-3xl font-bold text-primary font-heading">Wallet Resolver</CardTitle>
                 <CardDescription className="text-base text-muted-foreground pt-1">
                     Send crypto using just a phone number.
                 </CardDescription>

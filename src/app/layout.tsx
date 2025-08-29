@@ -38,7 +38,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${poppins.variable} flex flex-col min-h-screen`}>
+      <body className={`${inter.variable} ${poppins.variable} flex flex-col min-h-screen font-sans`}>
         <AuthProvider>
           <PhoneVerificationProvider>
             <WalletProvider>
